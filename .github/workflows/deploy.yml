@@ -35,7 +35,7 @@ jobs:
           server: ${{ secrets.CPANEL_SERVER }}
           username: ${{ secrets.CPANEL_USERNAME }}
           password: ${{ secrets.CPANEL_PASSWORD }}
-          local-dir: ./dist  # Deploy the contents of the dist/ folder
+          local-dir: ./dist/  # Make sure the folder ends with /
           server-dir: /public_html  # Adjust if your website is in a subfolder
           protocol: ftps  # Use FTPS for secure transfer
           port: 21  # Default FTP port
