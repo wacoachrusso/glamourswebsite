@@ -39,7 +39,7 @@ jobs:
           server-dir: /public_html  # Adjust if your website is in a subfolder
           protocol: ftps  # Use FTPS for secure transfer
           port: 21  # Default FTP port
-          exclude:
-            - .git*
-            - node_modules/**/*
-            - README.md
+          exclude: |
+            .git*
+            node_modules/**
+            README.md
