@@ -1,30 +1,45 @@
-name: Deploy to cPanel
+name: Build and Deploy to cPanel 
+
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main  # Triggers the workflow on pushes to the main branch
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          
+          node-version: '18'  # Update Node.js version
+
+      # Step 3: Install dependencies
       - name: Install Dependencies
         run: npm install
-        
-      - name: Build
+
+      # Step 4: Build the project
+      - name: Build Project
         run: npm run build
-        
-      - name: Deploy to cPanel
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+
+      # Step 5: Deploy the built files via FTP
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.CPANEL_SERVER }}
           username: ${{ secrets.CPANEL_USERNAME }}
           password: ${{ secrets.CPANEL_PASSWORD }}
-          local-dir: ./dist/
-          server-dir: /public_html/
+          local-dir: ./dist  # Deploy the contents of the dist/ folder
+          server-dir: /public_html  # Adjust if your website is in a subfolder
+          protocol: ftps  # Use FTPS for secure transfer
+          port: 21  # Default FTP port
+          exclude:
+            - .git*
+            - node_modules/**/*
+            - README.md
