@@ -1,85 +1,11 @@
+# Enable the rewrite engine
 RewriteEngine On
 RewriteBase /
 
-# If the request is for an existing file or directory, serve it directly
-RewriteCond %{REQUEST_FILENAME} -f [OR]
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteRule ^ - [L]
-
-# Handle React Router
-RewriteRule ^ index.html [L]
-
-# Enable CORS
+# Handle JavaScript files to serve them with the correct MIME type for modules
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
-</IfModule>
-
-# Proper MIME types for modern web assets
-<IfModule mod_mime.c>
-    # JavaScript modules
-    AddType application/javascript .js
-    AddType application/javascript .mjs
-    AddType text/javascript .js
-    AddType text/javascript .mjs
-
-    # JSON
-    AddType application/json .json
-
-    # Images
-    AddType image/png .png
-    AddType image/jpeg .jpg .jpeg
-    AddType image/gif .gif
-    AddType image/svg+xml .svg
-    AddType image/x-icon .ico
-    AddType image/webp .webp
-
-    # Fonts
-    AddType font/woff .woff
-    AddType font/woff2 .woff2
-    AddType application/vnd.ms-fontobject .eot
-    AddType font/ttf .ttf
-    AddType font/collection .ttc
-    AddType font/otf .otf
-
-    # Web Manifest
-    AddType application/manifest+json .webmanifest
-</IfModule>
-
-# Browser caching for static assets
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresByType text/html "access plus 1 hour"
-    ExpiresByType text/css "access plus 1 week"
-    ExpiresByType text/javascript "access plus 1 week"
-    ExpiresByType application/javascript "access plus 1 week"
-    ExpiresByType image/jpg "access plus 1 month"
-    ExpiresByType image/jpeg "access plus 1 month"
-    ExpiresByType image/png "access plus 1 month"
-    ExpiresByType image/gif "access plus 1 month"
-    ExpiresByType image/svg+xml "access plus 1 month"
-    ExpiresByType image/x-icon "access plus 1 year"
-    ExpiresByType font/woff "access plus 1 year"
-    ExpiresByType font/woff2 "access plus 1 year"
-    ExpiresByType application/json "access plus 1 week"
-</IfModule>
-
-# Compress files
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json image/svg+xml font/ttf font/otf font/woff application/vnd.ms-fontobject
-</IfModule>
-
-# Security headers
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-XSS-Protection "1; mode=block"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
-    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
-    
-    # Ensure JavaScript modules are served with correct MIME type
-    <FilesMatch "\.(js|mjs)$">
-        Header set Content-Type "application/javascript"
-    </FilesMatch>
+    Header set Content-Type "application/javascript" "expr=%{REQUEST_URI} =~ m#\.m?js$#"
 </IfModule>
 
 # Force HTTPS
