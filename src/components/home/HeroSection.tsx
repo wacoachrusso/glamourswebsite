@@ -18,7 +18,7 @@ const HeroSection: FC = () => {
 
       <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in">
         <span className="block bg-gradient-to-r from-glamour-gold via-pink-400 to-glamour-gold bg-clip-text text-transparent pb-2">
-          Welcome to
+          Testy Testy Welcome to
         </span>
         <span className="block bg-gradient-to-r from-glamour-gold via-pink-400 to-glamour-gold bg-clip-text text-transparent pb-2 mt-2">
           Glamour's Beauty Salon
