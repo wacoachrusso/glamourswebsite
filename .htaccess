@@ -11,8 +11,24 @@ RewriteRule ^ - [L]
 RewriteRule ^ index.html [L]
 
 # Set MIME types for JavaScript modules
+AddType application/javascript .js
+AddType application/javascript .mjs
+AddType text/javascript .js
+AddType text/javascript .mjs
+
+<FilesMatch "\.(js|mjs)$">
+    Header set Content-Type "application/javascript"
+</FilesMatch>
+
+# Force JavaScript modules to be served with correct MIME type
+<IfModule mod_mime.c>
+    AddHandler application/javascript .js
+    AddHandler application/javascript .mjs
+</IfModule>
+
+# Additional security headers for JavaScript
 <IfModule mod_headers.c>
-    Header set Content-Type "application/javascript" "expr=%{REQUEST_URI} =~ m#\.m?js$#"
+    Header set X-Content-Type-Options "nosniff"
 </IfModule>
 
 # Set CORS headers to allow cross-origin requests
