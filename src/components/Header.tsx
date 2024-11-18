@@ -63,7 +63,7 @@ const Header: FC = () => {
             {/* Logo */}
             <Link to="/" className="flex-shrink-0">
               <img 
-                src="/assets/images/logo.png"
+                src="/src/assets/logo.png"
                 alt="Glamour's Beauty Salon" 
                 className={`transition-all duration-300 ${
                   isScrolled ? 'h-16' : 'h-20'

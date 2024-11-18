@@ -25,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Logo */}
       <div className="p-6 border-b">
         <img 
-          src="/logo.png"
+          src="/src/assets/logo.png"
           alt="Glamour's Beauty Salon" 
           className="h-12 w-auto mx-auto"
           style={{ objectFit: 'contain' }}

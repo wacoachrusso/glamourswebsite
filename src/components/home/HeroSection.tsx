@@ -8,7 +8,7 @@ const HeroSection: FC = () => {
       <div className="flex justify-center items-center mb-8">
         <div className="relative">
           <img 
-            src="/logo.png"
+            src="/src/assets/logo.png"
             alt="Glamour's Beauty Salon" 
             className="h-32 w-auto animate-float"
             style={{ objectFit: 'contain' }}
