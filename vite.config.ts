@@ -18,17 +18,24 @@ export default defineConfig({
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
         },
-        entryFileNames: 'assets/[name].[hash].js',
-        chunkFileNames: 'assets/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash][extname]'
-      }
-    }
+      },
+    },
   },
-  base: '/',
   server: {
+    headers: {
+      'Cache-Control': 'no-store',
+      'Content-Type': 'application/javascript; charset=utf-8',
+    },
     port: 5173,
     strictPort: true,
-    host: true
+    cors: true,
   },
-  publicDir: 'public'
+  preview: {
+    port: 5173,
+    strictPort: true,
+    headers: {
+      'Cache-Control': 'no-store',
+      'Content-Type': 'application/javascript; charset=utf-8',
+    },
+  }
 });
