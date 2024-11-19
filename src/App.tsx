@@ -19,16 +19,14 @@ const App: FC = () => {
     <LanguageProvider>
       <Router>
         <Routes>
-          {/* Employee Dashboard Route */}
           <Route path="/employee-dashboard/*" element={<DashboardLayout />} />
           
-          {/* Public Routes */}
           <Route
             path="*"
             element={
               <div className="flex flex-col min-h-screen">
                 <Header />
-                <main className="flex-grow pt-48 md:pt-56">
+                <main className="flex-grow pt-24">
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/services" element={<Services />} />
