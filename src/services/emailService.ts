@@ -1,7 +1,6 @@
 import emailjs from '@emailjs/browser';
 
 interface EmailTemplateParams {
-  [key: string]: string; // Add this line to make the type compatible with emailjs.send() method.
   to_name: string;
   to_email: string;
   service_name: string;
@@ -14,21 +13,17 @@ interface EmailTemplateParams {
   salon_address: string;
 }
 
-const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
 export const sendConfirmationEmail = async (templateParams: EmailTemplateParams) => {
   try {
     const response = await emailjs.send(
-      SERVICE_ID,
-      TEMPLATE_ID,
+      import.meta.env.VITE_EMAILJS_SERVICE_ID,
+      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
       templateParams,
-      PUBLIC_KEY
+      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
     );
     return response;
   } catch (error) {
-    console.error('Failed to send email via EmailJS:', error);
+    console.error('Failed to send email:', error);
     throw error;
   }
 };
