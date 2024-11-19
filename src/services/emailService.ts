@@ -14,16 +14,21 @@ interface EmailTemplateParams {
 }
 
 export const sendConfirmationEmail = async (templateParams: EmailTemplateParams) => {
+  const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+  const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+  const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
   try {
     const response = await emailjs.send(
-      import.meta.env.VITE_EMAILJS_SERVICE_ID,
-      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-      templateParams,
-      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      SERVICE_ID,
+      TEMPLATE_ID,
+      templateParams as unknown as Record<string, string>, // Correcting type cast for templateParams
+      PUBLIC_KEY
     );
+
     return response;
   } catch (error) {
-    console.error('Failed to send email:', error);
+    console.error('Failed to send email via EmailJS:', error);
     throw error;
   }
 };
