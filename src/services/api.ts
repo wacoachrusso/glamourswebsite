@@ -1,9 +1,5 @@
 import axios from 'axios';
 
-// Klaviyo API integration
-const KLAVIYO_API_KEY = import.meta.env.VITE_KLAVIYO_API_KEY;
-const KLAVIYO_LIST_ID = import.meta.env.VITE_KLAVIYO_LIST_ID;
-
 const API_URL = '/api';
 
 const api = axios.create({
@@ -22,23 +18,45 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Add Subscriber to Klaviyo
-export const addSubscriberToKlaviyo = async (email: string) => {
+/**
+ * Get Professionals
+ * This function returns a list of professionals available at the salon.
+ */
+export const getProfessionals = async () => {
   try {
-    const klaviyoApiUrl = `https://a.klaviyo.com/api/v2/list/${KLAVIYO_LIST_ID}/members`;
-
-    await axios.post(klaviyoApiUrl, {
-      api_key: KLAVIYO_API_KEY,
-      profiles: [{ email }],
-    });
-
-    console.log('Subscriber added successfully to Klaviyo.');
+    // For demo purposes, return static professionals
+    return [
+      {
+        id: 1,
+        name: "Sarah Johnson",
+        role: "Master Stylist",
+        specialties: ["Color Specialist", "Precision Cuts", "Wedding Styles"],
+        experience: 12,
+      },
+      {
+        id: 2,
+        name: "Michael Chen",
+        role: "Senior Stylist",
+        specialties: ["Asian Hair Specialist", "Creative Color", "Men's Styling"],
+        experience: 8,
+      },
+      {
+        id: 3,
+        name: "Isabella Rodriguez",
+        role: "Texture Specialist",
+        specialties: ["Curly Hair", "Natural Hair", "Extensions"],
+        experience: 10,
+      },
+    ];
   } catch (error: any) {
-    console.error('Klaviyo API Error:', error.message);
+    throw error.response?.data || { error: 'Failed to load professionals' };
   }
 };
 
-// Booking Function Integration
+/**
+ * Book Appointment
+ * This function books an appointment.
+ */
 export const bookAppointment = async (appointmentData: any) => {
   try {
     // For demo purposes, simulate API call
@@ -58,16 +76,92 @@ export const bookAppointment = async (appointmentData: any) => {
     // Simulate sending confirmation email
     console.log('Confirmation email sent to:', appointmentData.clientEmail);
 
-    // Add client email to Klaviyo list
-    if (appointmentData.clientEmail) {
-      await addSubscriberToKlaviyo(appointmentData.clientEmail);
-    }
-
     return newAppointment;
   } catch (error: any) {
     throw error.response?.data || { error: 'Failed to book appointment' };
   }
 };
 
-// Other existing functions such as:
-// getProfessionals, getAppointments, getServices, updateAppointmentStatus
+/**
+ * Get Appointments
+ * This function returns a list of appointments.
+ */
+export const getAppointments = async () => {
+  try {
+    // For demo purposes, get appointments from localStorage
+    const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+    return appointments;
+  } catch (error: any) {
+    throw error.response?.data || { error: 'Failed to load appointments' };
+  }
+};
+
+/**
+ * Get Services
+ * This function returns a list of salon services.
+ */
+export const getServices = async () => {
+  try {
+    // For demo purposes, return static services
+    return [
+      {
+        id: 1,
+        name: "Women's Haircut & Style",
+        description: "Professional haircut and styling service",
+        price: 85.0,
+        duration: 60,
+      },
+      {
+        id: 2,
+        name: "Men's Haircut & Style",
+        description: "Professional men's haircut and styling",
+        price: 45.0,
+        duration: 45,
+      },
+      {
+        id: 3,
+        name: "Color & Highlights",
+        description: "Full color or highlight service",
+        price: 175.0,
+        duration: 120,
+      },
+      {
+        id: 4,
+        name: "Balayage",
+        description: "Hand-painted highlights for a natural look",
+        price: 200.0,
+        duration: 180,
+      },
+      {
+        id: 5,
+        name: "Brazilian Blowout",
+        description: "Professional smoothing treatment",
+        price: 300.0,
+        duration: 180,
+      },
+    ];
+  } catch (error: any) {
+    throw error.response?.data || { error: 'Failed to load services' };
+  }
+};
+
+/**
+ * Update Appointment Status
+ * This function updates the status of an appointment.
+ */
+export const updateAppointmentStatus = async (id: number, status: string) => {
+  try {
+    // For demo purposes, update appointment in localStorage
+    const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+    const updatedAppointments = appointments.map((apt: any) =>
+      apt.id === id ? { ...apt, status } : apt
+    );
+    localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+    return { id, status };
+  } catch (error: any) {
+    throw error.response?.data || { error: 'Failed to update appointment status' };
+  }
+};
+
+// Default export the `api` instance to use axios in other parts of your project
+export default api;
