@@ -29,21 +29,21 @@ const Header: FC = () => {
   return (
     <header className="w-full">
       {/* Top Info Bar */}
-      <div className="bg-glamour-800 text-white py-2">
+      <div className="bg-glamour-dark text-white py-2">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-4 md:gap-0 md:justify-between text-sm">
               <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-2 text-glamour-200" />
+                <Clock className="w-4 h-4 mr-2 text-glamour-gold" />
                 <span>Open everyday 10am - 7pm</span>
               </div>
               <div className="hidden md:flex items-center">
-                <MapPin className="w-4 h-4 mr-2 text-glamour-200" />
+                <MapPin className="w-4 h-4 mr-2 text-glamour-gold" />
                 <span>275 Adams St, Newark NJ 07105</span>
               </div>
               <div className="flex items-center">
-                <Phone className="w-4 h-4 mr-2 text-glamour-200" />
-                <a href="tel:9733445199" className="hover:text-glamour-200 transition-colors">
+                <Phone className="w-4 h-4 mr-2 text-glamour-gold" />
+                <a href="tel:9733445199" className="hover:text-glamour-gold transition-colors">
                   (973) 344-5199
                 </a>
               </div>
@@ -63,12 +63,11 @@ const Header: FC = () => {
             {/* Logo */}
             <Link to="/" className="flex-shrink-0">
               <img 
-                src="/logo.png"
+                src="/images/logo.png"
                 alt="Glamour's Beauty Salon" 
                 className={`transition-all duration-300 ${
                   isScrolled ? 'h-16' : 'h-20'
                 }`}
-                style={{ objectFit: 'contain' }}
               />
             </Link>
 
@@ -80,7 +79,7 @@ const Header: FC = () => {
                     key={link.path}
                     to={link.path}
                     className={`nav-link text-sm font-medium tracking-wide uppercase ${
-                      location.pathname === link.path ? 'text-glamour-600 after:w-full' : ''
+                      location.pathname === link.path ? 'text-glamour-gold after:w-full' : 'text-glamour-dark'
                     }`}
                   >
                     {link.label}
@@ -92,7 +91,7 @@ const Header: FC = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-glamour-600 hover:text-glamour-700 transition-colors"
+              className="md:hidden p-2 text-glamour-dark hover:text-glamour-gold transition-colors"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -115,8 +114,8 @@ const Header: FC = () => {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`text-sm font-medium tracking-wide uppercase ${
                     location.pathname === link.path 
-                      ? 'text-glamour-600' 
-                      : 'text-glamour-800 hover:text-glamour-600'
+                      ? 'text-glamour-gold' 
+                      : 'text-glamour-dark hover:text-glamour-gold'
                   }`}
                 >
                   {link.label}
