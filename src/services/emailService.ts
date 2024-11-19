@@ -1,5 +1,6 @@
 import emailjs from '@emailjs/browser';
 import { emailConfig } from '../config/env';
+import { getSMSAddress } from './smsGateway';
 
 interface EmailTemplateParams {
   to_name: string;
@@ -12,7 +13,17 @@ interface EmailTemplateParams {
   notes: string;
   salon_phone: string;
   salon_address: string;
+  carrier?: string;
 }
+
+const createSMSMessage = (params: EmailTemplateParams): string => {
+  // Create a concise SMS message within 160 characters
+  return `Glamour's Salon Appt Confirmed:
+${params.appointment_date} @ ${params.appointment_time}
+Service: ${params.service_name}
+Stylist: ${params.stylist_name}
+Questions? Call ${params.salon_phone}`;
+};
 
 export const sendConfirmationEmail = async (templateParams: EmailTemplateParams) => {
   try {
@@ -42,20 +53,43 @@ export const sendConfirmationEmail = async (templateParams: EmailTemplateParams)
       phone: templateParams.phone_number || 'Not provided'
     };
 
-    // Send the email
-    const response = await emailjs.send(
+    // Send email confirmation
+    const emailResponse = await emailjs.send(
       emailConfig.serviceId,
       emailConfig.templateId,
       formattedParams
     );
 
-    if (response.status !== 200) {
-      throw new Error(`EmailJS failed with status: ${response.status}`);
+    if (emailResponse.status !== 200) {
+      throw new Error(`EmailJS failed with status: ${emailResponse.status}`);
     }
 
-    return response;
+    // Send SMS confirmation if phone and carrier are provided
+    if (templateParams.phone_number && templateParams.carrier) {
+      const smsAddress = getSMSAddress(templateParams.phone_number, templateParams.carrier);
+      
+      if (smsAddress) {
+        const smsParams = {
+          ...formattedParams,
+          user_email: smsAddress,
+          message: createSMSMessage(templateParams),
+          template_params: {
+            message: createSMSMessage(templateParams)
+          }
+        };
+
+        // Send SMS via email-to-SMS gateway
+        await emailjs.send(
+          emailConfig.serviceId,
+          emailConfig.templateId,
+          smsParams
+        );
+      }
+    }
+
+    return emailResponse;
   } catch (error: any) {
-    console.error('Error sending confirmation email:', error);
-    throw new Error(error.message || 'Failed to send confirmation email. Please try again.');
+    console.error('Error sending confirmation:', error);
+    throw new Error(error.message || 'Failed to send confirmation. Please try again.');
   }
 };

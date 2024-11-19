@@ -12,6 +12,7 @@ const Booking = () => {
     clientName: '',
     clientEmail: '',
     clientPhone: '',
+    carrier: '',
     selectedService: '',
     selectedProfessional: '',
     appointmentDate: '',
@@ -26,6 +27,11 @@ const Booking = () => {
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
+  };
+
+  const validatePhone = (phone: string) => {
+    const cleaned = phone.replace(/\D/g, '');
+    return cleaned.length === 10;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -71,13 +77,22 @@ const Booking = () => {
         throw new Error('Please select appointment date and time');
       }
 
+      // Validate phone and carrier if phone is provided
+      if (formData.clientPhone && !validatePhone(formData.clientPhone)) {
+        throw new Error('Please enter a valid 10-digit phone number');
+      }
+
+      if (formData.clientPhone && !formData.carrier) {
+        throw new Error('Please select your mobile carrier for SMS notifications');
+      }
+
       // Get service details
       const selectedService = services.find(s => s.id === formData.selectedService);
       if (!selectedService) {
         throw new Error('Selected service not found');
       }
 
-      // Send confirmation email
+      // Send confirmation email and SMS
       await sendConfirmationEmail({
         to_name: formData.clientName.trim(),
         to_email: formData.clientEmail.trim(),
@@ -86,6 +101,7 @@ const Booking = () => {
         appointment_date: new Date(formData.appointmentDate).toLocaleDateString(),
         appointment_time: formData.appointmentTime,
         phone_number: formData.clientPhone?.trim() || 'Not provided',
+        carrier: formData.carrier,
         notes: formData.notes?.trim() || 'No special notes',
         salon_phone: '(973) 344-5199',
         salon_address: '275 Adams St, Newark, NJ 07105'
@@ -106,6 +122,7 @@ const Booking = () => {
         clientName: '',
         clientEmail: '',
         clientPhone: '',
+        carrier: '',
         selectedService: '',
         selectedProfessional: '',
         appointmentDate: '',
@@ -129,7 +146,7 @@ const Booking = () => {
           </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Booking Confirmed!</h2>
           <p className="text-gray-600 mb-6">
-            Thank you for choosing Glamour's Beauty Salon. We've sent a confirmation email with your appointment details.
+            Thank you for choosing Glamour's Beauty Salon. We've sent a confirmation email{formData.clientPhone ? ' and SMS' : ''} with your appointment details.
           </p>
           <button
             onClick={() => setSuccess(false)}
