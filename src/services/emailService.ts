@@ -1,6 +1,6 @@
 import emailjs from '@emailjs/browser';
-import { emailConfig } from '../config/env';
 
+// Interface for the email template parameters
 interface EmailTemplateParams {
   to_name: string;
   to_email: string;
@@ -14,9 +14,17 @@ interface EmailTemplateParams {
   salon_address: string;
 }
 
+// Environment variables (replace if using a different way to import them)
+const emailConfig = {
+  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+  templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+  publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+};
+
+// Function to send the confirmation email
 export const sendConfirmationEmail = async (templateParams: EmailTemplateParams) => {
   try {
-    // Format the templateParams to match Record<string, string>
+    // Format the template parameters
     const formattedParams: Record<string, string> = {
       to_name: templateParams.to_name,
       to_email: templateParams.to_email,
@@ -30,20 +38,26 @@ export const sendConfirmationEmail = async (templateParams: EmailTemplateParams)
       salon_address: templateParams.salon_address,
     };
 
+    // Log the parameters for debugging
+    console.log('Sending email with parameters:', formattedParams);
+
+    // Call EmailJS to send the email
     const response = await emailjs.send(
-      emailConfig.serviceId,
-      emailConfig.templateId,
-      formattedParams,
-      emailConfig.publicKey
+      emailConfig.serviceId,    // Service ID
+      emailConfig.templateId,   // Template ID
+      formattedParams,          // Template parameters
+      emailConfig.publicKey     // Public API key
     );
 
+    // Check the response
     if (response.status !== 200) {
-      throw new Error('Failed to send email');
+      throw new Error(`EmailJS failed with status: ${response.status}`);
     }
 
+    console.log('Email sent successfully:', response);
     return response;
   } catch (error) {
-    console.error('Failed to send email:', error);
+    console.error('Error during email send:', error);
     throw new Error('Failed to send confirmation email. Please try again.');
   }
 };
