@@ -6,8 +6,9 @@ interface PersonalInfoProps {
     clientName: string;
     clientEmail: string;
     clientPhone: string;
+    carrier: string;
   };
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
 }
 
 const PersonalInfo: React.FC<PersonalInfoProps> = ({ formData, onChange }) => {
@@ -81,6 +82,33 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ formData, onChange }) => {
           </div>
           <p className="mt-1 text-sm text-gray-500">Optional, but recommended for appointment reminders</p>
         </div>
+
+        {formData.clientPhone && (
+          <div>
+            <label htmlFor="carrier" className="block text-sm font-medium text-gray-700 mb-1">
+              Mobile Carrier
+            </label>
+            <select
+              id="carrier"
+              name="carrier"
+              value={formData.carrier}
+              onChange={onChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-glamour-gold/50 focus:border-glamour-gold"
+            >
+              <option value="">Select your carrier</option>
+              <option value="att">AT&T</option>
+              <option value="verizon">Verizon</option>
+              <option value="tmobile">T-Mobile</option>
+              <option value="sprint">Sprint</option>
+              <option value="uscellular">US Cellular</option>
+              <option value="metropcs">Metro PCS</option>
+              <option value="boost">Boost Mobile</option>
+              <option value="cricket">Cricket</option>
+              <option value="virgin">Virgin Mobile</option>
+            </select>
+            <p className="mt-1 text-sm text-gray-500">Required for SMS notifications</p>
+          </div>
+        )}
       </div>
     </div>
   );
