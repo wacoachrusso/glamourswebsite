@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, Mail, Phone, Scissors, AlertCircle, Users } from 'lucide-react';
 import { bookAppointment, getServices, getProfessionals } from '../services/api';
+import { sendBookingConfirmation } from '../services/emailService';
 
 interface Service {
   id: number;
@@ -24,7 +25,7 @@ const Booking: React.FC = () => {
     clientEmail: '',
     clientPhone: '',
     serviceId: '',
-    professionalId: 'any', // Default to "Any Available Professional"
+    professionalId: 'any',
     date: '',
     time: '',
     notes: ''
@@ -37,6 +38,7 @@ const Booking: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [servicesLoading, setServicesLoading] = useState(true);
   const [professionalsLoading, setProfessionalsLoading] = useState(true);
+  const [emailSending, setEmailSending] = useState(false);
 
   useEffect(() => {
     loadServices();
@@ -68,7 +70,6 @@ const Booking: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prevState => ({ ...prevState, [name]: value }));
-    // Clear error/success when user starts typing
     if (error) setError('');
     if (success) setSuccess('');
   };
@@ -78,6 +79,7 @@ const Booking: React.FC = () => {
     setLoading(true);
     setError('');
     setSuccess('');
+    setEmailSending(true);
 
     try {
       const selectedService = services.find(s => s.id === parseInt(formData.serviceId));
@@ -89,6 +91,7 @@ const Booking: React.FC = () => {
         ? null 
         : professionals.find(p => p.id === parseInt(formData.professionalId));
 
+      // Book the appointment
       await bookAppointment({
         ...formData,
         serviceId: parseInt(formData.serviceId),
@@ -97,7 +100,17 @@ const Booking: React.FC = () => {
         professionalId: formData.professionalId === 'any' ? null : parseInt(formData.professionalId)
       });
 
-      setSuccess('Appointment booked successfully! We\'ll confirm your booking shortly.');
+      // Send confirmation email
+      await sendBookingConfirmation({
+        clientName: formData.clientName,
+        clientEmail: formData.clientEmail,
+        serviceName: selectedService.name,
+        date: formData.date,
+        time: formData.time,
+        notes: formData.notes
+      });
+
+      setSuccess('Appointment booked successfully! Check your email for confirmation details.');
       setFormData({
         clientName: '',
         clientEmail: '',
@@ -109,9 +122,10 @@ const Booking: React.FC = () => {
         notes: ''
       });
     } catch (err: any) {
-      setError('Failed to book appointment. Please try again.');
+      setError(err.message || 'Failed to book appointment. Please try again.');
     } finally {
       setLoading(false);
+      setEmailSending(false);
     }
   };
 
@@ -295,18 +309,18 @@ const Booking: React.FC = () => {
             <div className="flex flex-col items-center space-y-4">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || emailSending}
                 className={`px-8 py-3 bg-glamour-gold text-white rounded-full font-semibold hover:bg-opacity-90 transform hover:-translate-y-1 transition-all duration-300 ${
-                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                  (loading || emailSending) ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
-                {loading ? (
+                {loading || emailSending ? (
                   <span className="flex items-center">
                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Booking...
+                    {emailSending ? 'Sending confirmation...' : 'Booking...'}
                   </span>
                 ) : (
                   'Confirm Booking'
