@@ -4,16 +4,16 @@ import { Scissors, Star } from 'lucide-react';
 
 const HeroSection: FC = () => {
   return (
-    <div className="relative text-center py-8">
-      <div className="flex justify-center mb-4">
+    <div className="relative text-center -mt-16 mb-32">
+      <div className="flex justify-center">
         <img 
           src="/images/logo.png"
           alt="Glamour's Beauty Salon" 
-          className="h-24 w-auto animate-float"
+          className="h-16 w-auto animate-float"
         />
       </div>
 
-      <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">
+      <h1 className="text-4xl md:text-5xl font-bold mb-2 animate-fade-in">
         <span className="block text-glamour-gold">Welcome to</span>
         <span className="block text-glamour-gold mt-1">Glamour's Beauty Salon</span>
       </h1>

@@ -16,9 +16,12 @@ const Home: React.FC = () => {
     <div className="bg-gradient-glamour min-h-screen">
       <div className="container mx-auto px-4">
         <HeroSection />
-        <InfoSection />
         
-        <div className="mb-16">
+        <div className="relative">
+          <InfoSection />
+        </div>
+        
+        <div className="mt-32 mb-16">
           <h2 className="text-3xl font-bold text-center text-glamour-dark mb-8">
             Featured Styles
           </h2>

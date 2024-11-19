@@ -29,7 +29,7 @@ const Header: FC = () => {
   return (
     <>
       {/* Spacer div to account for fixed header height */}
-      <div className="h-[140px]"></div>
+      <div className="h-[100px]"></div>
       
       <header className="w-full fixed top-0 left-0 right-0 z-50">
         <div className="bg-glamour-dark text-white py-1">
@@ -57,8 +57,8 @@ const Header: FC = () => {
 
         <div className={`w-full transition-all duration-300 ${
           isScrolled 
-            ? 'bg-white/95 backdrop-blur-md shadow-glamour py-2' 
-            : 'bg-white/80 backdrop-blur-md py-4'
+            ? 'bg-white/95 backdrop-blur-md shadow-glamour py-1' 
+            : 'bg-white/80 backdrop-blur-md py-2'
         }`}>
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between">
@@ -67,7 +67,7 @@ const Header: FC = () => {
                   src="/images/logo.png"
                   alt="Glamour's Beauty Salon" 
                   className={`transition-all duration-300 ${
-                    isScrolled ? 'h-12' : 'h-16'
+                    isScrolled ? 'h-10' : 'h-12'
                   }`}
                 />
               </Link>

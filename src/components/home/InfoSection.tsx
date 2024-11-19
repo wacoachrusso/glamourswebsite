@@ -3,7 +3,7 @@ import { Clock, MapPin, Phone } from 'lucide-react';
 
 const InfoSection: React.FC = () => {
   return (
-    <div className="mb-16 -mt-8">
+    <div className="relative z-10">
       <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-glamour-lg overflow-hidden border border-glamour-gold/10">
         <div className="grid grid-cols-1 md:grid-cols-3">
           {/* Hours */}
