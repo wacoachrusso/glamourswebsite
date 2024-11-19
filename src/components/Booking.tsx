@@ -23,6 +23,11 @@ const Booking = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -44,39 +49,49 @@ const Booking = () => {
     setError('');
     setLoading(true);
 
-    // Basic validation
-    if (!formData.clientName || !formData.clientEmail || !formData.selectedService || 
-        !formData.appointmentDate || !formData.appointmentTime) {
-      setError('Please fill in all required fields');
-      setLoading(false);
-      return;
-    }
-
     try {
+      // Validate required fields
+      if (!formData.clientName?.trim()) {
+        throw new Error('Please enter your name');
+      }
+
+      if (!formData.clientEmail?.trim()) {
+        throw new Error('Please enter your email address');
+      }
+
+      if (!validateEmail(formData.clientEmail)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      if (!formData.selectedService) {
+        throw new Error('Please select a service');
+      }
+
+      if (!formData.appointmentDate || !formData.appointmentTime) {
+        throw new Error('Please select appointment date and time');
+      }
+
       // Get service details
       const selectedService = services.find(s => s.id === formData.selectedService);
       if (!selectedService) {
         throw new Error('Selected service not found');
       }
 
-      // Prepare email template parameters
-      const emailParams = {
-        to_name: formData.clientName,
-        to_email: formData.clientEmail,
+      // Send confirmation email
+      await sendConfirmationEmail({
+        to_name: formData.clientName.trim(),
+        to_email: formData.clientEmail.trim(),
         service_name: selectedService.name,
         stylist_name: formData.selectedProfessional || 'Our Expert Stylist',
         appointment_date: new Date(formData.appointmentDate).toLocaleDateString(),
         appointment_time: formData.appointmentTime,
-        phone_number: formData.clientPhone || 'Not provided',
-        notes: formData.notes || 'No special notes',
+        phone_number: formData.clientPhone?.trim() || 'Not provided',
+        notes: formData.notes?.trim() || 'No special notes',
         salon_phone: '(973) 344-5199',
         salon_address: '275 Adams St, Newark, NJ 07105'
-      };
+      });
 
-      // Send confirmation email
-      await sendConfirmationEmail(emailParams);
-
-      // Store appointment in localStorage (for demo purposes)
+      // Store appointment in localStorage
       const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
       appointments.push({
         id: Date.now(),
@@ -97,8 +112,8 @@ const Booking = () => {
         appointmentTime: '',
         notes: ''
       });
-    } catch (err) {
-      setError('Failed to book appointment. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to book appointment. Please try again.');
       console.error('Booking error:', err);
     } finally {
       setLoading(false);

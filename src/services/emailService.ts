@@ -1,6 +1,6 @@
 import emailjs from '@emailjs/browser';
+import { emailConfig } from '../config/env';
 
-// Interface for the email template parameters
 interface EmailTemplateParams {
   to_name: string;
   to_email: string;
@@ -14,50 +14,48 @@ interface EmailTemplateParams {
   salon_address: string;
 }
 
-// Environment variables (replace if using a different way to import them)
-const emailConfig = {
-  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
-  templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-  publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-};
-
-// Function to send the confirmation email
 export const sendConfirmationEmail = async (templateParams: EmailTemplateParams) => {
   try {
-    // Format the template parameters
-    const formattedParams: Record<string, string> = {
-      to_name: templateParams.to_name,
-      to_email: templateParams.to_email,
+    // Validate required email parameters
+    if (!templateParams.to_email?.trim()) {
+      throw new Error('Recipient email address is required');
+    }
+
+    if (!templateParams.to_name?.trim()) {
+      throw new Error('Recipient name is required');
+    }
+
+    // Initialize EmailJS
+    emailjs.init(emailConfig.publicKey);
+
+    // Format the template parameters to match exactly with the template variables
+    const formattedParams = {
+      from_name: templateParams.to_name.trim(),
+      user_name: templateParams.to_name.trim(),
+      user_email: templateParams.to_email.trim(),
       service_name: templateParams.service_name,
-      stylist_name: templateParams.stylist_name,
       appointment_date: templateParams.appointment_date,
       appointment_time: templateParams.appointment_time,
-      phone_number: templateParams.phone_number,
-      notes: templateParams.notes,
-      salon_phone: templateParams.salon_phone,
       salon_address: templateParams.salon_address,
+      salon_phone: templateParams.salon_phone,
+      notes: templateParams.notes || 'No special notes',
+      phone: templateParams.phone_number || 'Not provided'
     };
 
-    // Log the parameters for debugging
-    console.log('Sending email with parameters:', formattedParams);
-
-    // Call EmailJS to send the email
+    // Send the email
     const response = await emailjs.send(
-      emailConfig.serviceId,    // Service ID
-      emailConfig.templateId,   // Template ID
-      formattedParams,          // Template parameters
-      emailConfig.publicKey     // Public API key
+      emailConfig.serviceId,
+      emailConfig.templateId,
+      formattedParams
     );
 
-    // Check the response
     if (response.status !== 200) {
       throw new Error(`EmailJS failed with status: ${response.status}`);
     }
 
-    console.log('Email sent successfully:', response);
     return response;
-  } catch (error) {
-    console.error('Error during email send:', error);
-    throw new Error('Failed to send confirmation email. Please try again.');
+  } catch (error: any) {
+    console.error('Error sending confirmation email:', error);
+    throw new Error(error.message || 'Failed to send confirmation email. Please try again.');
   }
 };
