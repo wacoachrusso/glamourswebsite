@@ -7,7 +7,7 @@ const HeroSection: FC = () => {
     <div className="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-4">
       {/* Background with gradient overlay */}
       <div 
-        className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center"
+        className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center"
         style={{ backgroundPosition: '50% 30%' }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-glamour-light/90" />
