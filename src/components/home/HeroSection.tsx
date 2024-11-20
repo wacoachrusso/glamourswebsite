@@ -26,7 +26,7 @@ const HeroSection: FC = () => {
 
         {/* Main Title with Enhanced Gradient Animation */}
         <h1 className="text-5xl md:text-7xl font-bold mb-8 text-white opacity-0 animate-[fadeInUp_1s_ease-out_0.5s_forwards]">
-          <span className="block mb-3 font-light">Welcome to</span>
+          <span className="block mb-3 font-light">Welcome to </span>
           <span className="block bg-gradient-to-r from-glamour-gold via-pink-300 to-glamour-gold bg-clip-text text-transparent bg-[length:200%_auto] animate-[shimmer_3s_infinite] drop-shadow-lg">
             Glamour's Beauty Salon
           </span>
