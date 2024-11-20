@@ -13,7 +13,7 @@ const Services: React.FC = () => {
     {
       name: 'Expert Braiding',
       description: 'Precision braiding services including cornrows, box braids, and creative patterns.',
-      image: IMAGES.services.braids.main,
+      image: IMAGES.services.braids.style2,
       alt: 'Precision cornrow braids'
     },
     {

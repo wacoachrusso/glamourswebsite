@@ -24,7 +24,7 @@ const FeaturedStyles: FC = () => {
       id: 3,
       name: 'Creative Braiding',
       description: 'Intricate braiding patterns with modern edge',
-      image: IMAGES.services.braids.main,
+      image: IMAGES.services.braids.style2,
       alt: 'Creative braiding design'
     },
     {
