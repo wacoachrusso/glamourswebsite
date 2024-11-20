@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Phone, Clock, Mail, Facebook, Instagram, Twitter } from 'lucide-react';
+import { MapPin, Phone, Clock, Mail, Facebook, Instagram } from 'lucide-react';
 
 const Footer: FC = () => {
   const currentYear = new Date().getFullYear();
