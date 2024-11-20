@@ -89,7 +89,7 @@ const Footer: FC = () => {
             <h3 className="text-lg font-semibold text-glamour-dark mb-4">Connect With Us</h3>
             <div className="flex space-x-4 mb-6">
               <a 
-                href="https://facebook.com" 
+                href="https://www.facebook.com/profile.php?id=100085002544559" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-glamour-gold bg-opacity-10 rounded-full flex items-center justify-center hover:bg-opacity-20 transition-colors"
@@ -97,20 +97,12 @@ const Footer: FC = () => {
                 <Facebook className="w-5 h-5 text-glamour-gold" />
               </a>
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/glamours.beauty.salon/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-glamour-gold bg-opacity-10 rounded-full flex items-center justify-center hover:bg-opacity-20 transition-colors"
               >
                 <Instagram className="w-5 h-5 text-glamour-gold" />
-              </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-glamour-gold bg-opacity-10 rounded-full flex items-center justify-center hover:bg-opacity-20 transition-colors"
-              >
-                <Twitter className="w-5 h-5 text-glamour-gold" />
               </a>
             </div>
             <div>
