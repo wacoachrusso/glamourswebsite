@@ -13,6 +13,7 @@ export default {
       },
       backgroundImage: {
         'gradient-glamour': 'linear-gradient(135deg, #ffd1dc 0%, #fff5f7 100%)',
+        'gradient-gold': 'linear-gradient(135deg, #d4af37 0%, #ffd700 100%)',
       },
       boxShadow: {
         'glamour': '0 4px 14px 0 rgba(212, 175, 55, 0.15)',
@@ -21,6 +22,7 @@ export default {
       animation: {
         'float': 'float 3s ease-in-out infinite',
         'fade-in': 'fadeIn 0.6s ease-out forwards',
+        'pulse-slow': 'pulse 3s infinite',
       },
       fontFamily: {
         'display': ['Inter', 'sans-serif'],
