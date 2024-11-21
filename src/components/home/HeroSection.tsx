@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { Scissors, Star, Beaker } from 'lucide-react';
+import { Scissors, Star } from 'lucide-react';
 
 const HeroSection: FC = () => {
   return (
@@ -26,7 +26,7 @@ const HeroSection: FC = () => {
 
         {/* Main Title with Enhanced Gradient Animation */}
         <h1 className="text-5xl md:text-7xl font-bold mb-8 text-white opacity-0 animate-[fadeInUp_1s_ease-out_0.5s_forwards]">
-          <span className="block mb-3 font-light">Welcome to </span>
+          <span className="block mb-3 font-light">Welcome to</span>
           <span className="block bg-gradient-to-r from-glamour-gold via-pink-300 to-glamour-gold bg-clip-text text-transparent bg-[length:200%_auto] animate-[shimmer_3s_infinite] drop-shadow-lg">
             Glamour's Beauty Salon
           </span>
@@ -34,7 +34,7 @@ const HeroSection: FC = () => {
         
         {/* Enhanced Subtitle with Fade Animation */}
         <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-14 opacity-0 animate-[fadeInUp_1s_ease-out_0.8s_forwards] leading-relaxed">
-          Experience beauty services in a warm, welcoming environment. 
+          Experience luxury beauty services in a warm, welcoming environment. 
           <span className="block mt-2 text-glamour-gold font-light">Where Beauty Meets Excellence</span>
         </p>
 
@@ -58,16 +58,6 @@ const HeroSection: FC = () => {
             <div className="relative flex items-center">
               <Star className="w-5 h-5 mr-3 text-glamour-gold group-hover:text-white transition-colors" />
               <span className="group-hover:text-white transition-colors">View Services</span>
-            </div>
-          </Link>
-          <Link
-            to="/test"
-            className="px-10 py-4 bg-white text-glamour-dark rounded-full font-semibold transform hover:-translate-y-1 transition-all duration-300 flex items-center group shadow-lg hover:shadow-xl relative overflow-hidden border-2 border-glamour-gold"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-glamour-gold to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative flex items-center">
-              <Beaker className="w-5 h-5 mr-3 text-glamour-gold group-hover:text-white transition-colors" />
-              <span className="group-hover:text-white transition-colors">Test Button</span>
             </div>
           </Link>
         </div>

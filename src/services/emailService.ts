@@ -10,14 +10,15 @@ interface EmailTemplateParams {
   appointment_date: string;
   appointment_time: string;
   phone_number: string;
-  carrier: string;
   notes: string;
   salon_phone: string;
   salon_address: string;
+  carrier?: string;
 }
 
 const createSMSMessage = (params: EmailTemplateParams): string => {
-  return `Glamour's Salon Appt:
+  // Create a concise SMS message within 160 characters
+  return `Glamour's Salon Appt Confirmed:
 ${params.appointment_date} @ ${params.appointment_time}
 Service: ${params.service_name}
 Stylist: ${params.stylist_name}
@@ -26,52 +27,63 @@ Questions? Call ${params.salon_phone}`;
 
 export const sendConfirmationEmail = async (templateParams: EmailTemplateParams) => {
   try {
+    // Validate required email parameters
+    if (!templateParams.to_email?.trim()) {
+      throw new Error('Recipient email address is required');
+    }
+
+    if (!templateParams.to_name?.trim()) {
+      throw new Error('Recipient name is required');
+    }
+
     // Initialize EmailJS
     emailjs.init(emailConfig.publicKey);
+
+    // Format the template parameters to match exactly with the template variables
+    const formattedParams = {
+      from_name: templateParams.to_name.trim(),
+      user_name: templateParams.to_name.trim(),
+      user_email: templateParams.to_email.trim(),
+      service_name: templateParams.service_name,
+      appointment_date: templateParams.appointment_date,
+      appointment_time: templateParams.appointment_time,
+      salon_address: templateParams.salon_address,
+      salon_phone: templateParams.salon_phone,
+      notes: templateParams.notes || 'No special notes',
+      phone: templateParams.phone_number || 'Not provided'
+    };
 
     // Send email confirmation
     const emailResponse = await emailjs.send(
       emailConfig.serviceId,
       emailConfig.templateId,
-      {
-        to_name: templateParams.to_name.trim(),
-        to_email: templateParams.to_email.trim(),
-        service_name: templateParams.service_name,
-        appointment_date: templateParams.appointment_date,
-        appointment_time: templateParams.appointment_time,
-        salon_address: templateParams.salon_address,
-        salon_phone: templateParams.salon_phone,
-        notes: templateParams.notes || 'No special notes',
-        phone: templateParams.phone_number || 'Not provided'
-      }
+      formattedParams
     );
 
     if (emailResponse.status !== 200) {
-      throw new Error(`Email failed with status: ${emailResponse.status}`);
+      throw new Error(`EmailJS failed with status: ${emailResponse.status}`);
     }
 
-    // Send SMS if phone and carrier are provided
+    // Send SMS confirmation if phone and carrier are provided
     if (templateParams.phone_number && templateParams.carrier) {
       const smsAddress = getSMSAddress(templateParams.phone_number, templateParams.carrier);
       
       if (smsAddress) {
-        const smsMessage = createSMSMessage(templateParams);
-        
+        const smsParams = {
+          ...formattedParams,
+          user_email: smsAddress,
+          message: createSMSMessage(templateParams),
+          template_params: {
+            message: createSMSMessage(templateParams)
+          }
+        };
+
+        // Send SMS via email-to-SMS gateway
         await emailjs.send(
           emailConfig.serviceId,
           emailConfig.templateId,
-          {
-            to_name: templateParams.to_name.trim(),
-            to_email: smsAddress,
-            message: smsMessage,
-            service_name: templateParams.service_name,
-            appointment_date: templateParams.appointment_date,
-            appointment_time: templateParams.appointment_time,
-            salon_phone: templateParams.salon_phone
-          }
+          smsParams
         );
-      } else {
-        throw new Error('Invalid carrier or phone number format');
       }
     }
 
@@ -80,4 +92,4 @@ export const sendConfirmationEmail = async (templateParams: EmailTemplateParams)
     console.error('Error sending confirmation:', error);
     throw new Error(error.message || 'Failed to send confirmation. Please try again.');
   }
-}
+};
