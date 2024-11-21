@@ -34,7 +34,7 @@ const HeroSection: FC = () => {
         
         {/* Enhanced Subtitle with Fade Animation */}
         <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-14 opacity-0 animate-[fadeInUp_1s_ease-out_0.8s_forwards] leading-relaxed">
-          Experience luxur
+          Experience luxury
          beauty services in a warm, welcoming environment. 
           <span className="block mt-2 text-glamour-gold font-light">Where Beauty Meets Excellence</span>
         </p>

@@ -1,9 +1,18 @@
+// vite.config.ts
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 5173 // Ensure the port is explicitly set
-  }
+  plugins: [
+    react(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: '_redirects',
+          dest: '.', // Copy to the root of the dist folder
+        },
+      ],
+    }),
+  ],
 });
