@@ -17,10 +17,12 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
   // Get tomorrow's date as the minimum selectable date
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
 
   // Get date 3 months from now as the maximum selectable date
   const maxDate = new Date();
   maxDate.setMonth(maxDate.getMonth() + 3);
+  maxDate.setHours(23, 59, 59, 999);
 
   // Available time slots
   const timeSlots = [
@@ -29,13 +31,17 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
     "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"
   ];
 
-  // Custom handler for DayPicker
+  // Custom handler for DayPicker that properly handles timezone
   const handleDaySelect = (day: Date | undefined) => {
     if (day) {
+      // Create a new date object and set it to midnight in local timezone
+      const localDate = new Date(day);
+      localDate.setHours(0, 0, 0, 0);
+      
       const event = {
         target: {
           name: 'appointmentDate',
-          value: day.toISOString().split('T')[0]
+          value: localDate.toISOString().split('T')[0]
         }
       } as React.ChangeEvent<HTMLInputElement>;
       onChange(event);
@@ -72,6 +78,9 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
     day_hidden: 'invisible',
   };
 
+  // Parse the selected date for the calendar
+  const selectedDate = appointmentDate ? new Date(appointmentDate + 'T00:00:00') : undefined;
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-glamour-dark flex items-center">
@@ -84,7 +93,7 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <DayPicker
             mode="single"
-            selected={appointmentDate ? new Date(appointmentDate) : undefined}
+            selected={selectedDate}
             onSelect={handleDaySelect}
             disabled={disabledDays}
             showOutsideDays={false}
@@ -92,6 +101,8 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
             modifiersClassNames={{
               selected: 'bg-glamour-gold text-white hover:bg-glamour-gold hover:text-white focus:bg-glamour-gold focus:text-white'
             }}
+            fromDate={tomorrow}
+            toDate={maxDate}
           />
         </div>
 
