@@ -1,7 +1,6 @@
 import React from 'react';
 import { Scissors } from 'lucide-react';
 import { services } from '../../data/services';
-import { IMAGES } from '../../config/images';
 
 interface ServiceSelectProps {
   selectedService: string;
@@ -9,15 +8,6 @@ interface ServiceSelectProps {
 }
 
 const ServiceSelect: React.FC<ServiceSelectProps> = ({ selectedService, onChange }) => {
-  const serviceImages = {
-    'womens-haircut': IMAGES.services.hairCuts.women,
-    'color-highlights': IMAGES.services.specialOccasions.main,
-    'brazilian-blowout': IMAGES.services.keratina.main,
-    'mens-haircut': IMAGES.services.hairCuts.women2,
-    'balayage': IMAGES.services.balayage.main,
-    'deep-conditioning': IMAGES.services.hairCuts.women3,
-  };
-
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-glamour-dark flex items-center">
@@ -43,9 +33,9 @@ const ServiceSelect: React.FC<ServiceSelectProps> = ({ selectedService, onChange
             >
               <div className="aspect-w-16 aspect-h-9 relative">
                 <img
-                  src={serviceImages[service.id as keyof typeof serviceImages]}
+                  src={service.image}
                   alt={service.name}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-48 object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               </div>
@@ -67,7 +57,7 @@ const ServiceSelect: React.FC<ServiceSelectProps> = ({ selectedService, onChange
                     ? 'border-glamour-gold opacity-100'
                     : 'border-transparent opacity-0'
                 }`}
-              ></div>
+              />
             </div>
           </div>
         ))}
