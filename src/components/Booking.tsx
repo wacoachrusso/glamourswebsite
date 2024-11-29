@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Check, AlertCircle } from 'lucide-react';
 import { sendConfirmationEmail } from '../services/emailService';
 import PersonalInfo from './booking/PersonalInfo';
@@ -8,6 +9,7 @@ import DateTimeSelect from './booking/DateTimeSelect';
 import { services } from '../data/services';
 
 const Booking = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     clientName: '',
     clientEmail: '',
@@ -130,6 +132,15 @@ const Booking = () => {
         appointmentTime: '',
         notes: ''
       });
+
+      // Navigate to home page with success state
+      setTimeout(() => {
+        navigate('/', { 
+          state: { bookingSuccess: true },
+          replace: true 
+        });
+      }, 2000);
+
     } catch (err: any) {
       setError(err.message || 'Failed to book appointment. Please try again.');
       console.error('Booking error:', err);
@@ -156,12 +167,7 @@ const Booking = () => {
           <p className="text-gray-600 mb-6">
             Thank you for choosing Glamour's Beauty Salon. We've sent a confirmation email{formData.clientPhone ? ' and SMS' : ''} with your appointment details.
           </p>
-          <button
-            onClick={() => setSuccess(false)}
-            className="px-6 py-2 bg-glamour-gold text-white rounded-lg hover:bg-opacity-90 transition-colors"
-          >
-            Book Another Appointment
-          </button>
+          <p className="text-gray-600">Redirecting you to the home page...</p>
         </div>
       </div>
     );

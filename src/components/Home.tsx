@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import HeroSection from './home/HeroSection';
 import InfoSection from './home/InfoSection';
 import WhyChooseUs from './home/WhyChooseUs';
@@ -6,6 +7,25 @@ import FeaturedStyles from './FeaturedStyles';
 import { Star, Award, Users, Clock } from 'lucide-react';
 
 const Home: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [showSuccess, setShowSuccess] = useState(location.state?.bookingSuccess || false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    
+    if (showSuccess) {
+      // Clear the success message after 5 seconds
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+        // Clear the router state
+        navigate('.', { replace: true, state: {} });
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccess, navigate]);
+
   const stats = [
     { number: '1000+', label: 'Satisfied Clients', icon: Users },
     { number: '15+', label: 'Expert Stylists', icon: Star },
@@ -15,6 +35,23 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-glamour-light via-white to-glamour-light/50">
+      {showSuccess && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 shadow-lg mx-4 animate-fade-in">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Star className="h-5 w-5 text-green-600" aria-hidden="true" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-green-800">
+                  Booking Confirmed! Check your email for appointment details.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4">
         <HeroSection />
         
