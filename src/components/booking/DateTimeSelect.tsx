@@ -3,6 +3,12 @@ import { Calendar as CalendarIcon, Clock, AlertCircle } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { isHolidayDate, isTimeSlotAvailable } from '../../utils/dateUtils';
+import { 
+  getAvailableTimeSlots, 
+  isWithinBusinessHours,
+  formatTimeDisplay,
+  BUSINESS_HOURS
+} from '../../utils/timeUtils';
 
 interface DateTimeSelectProps {
   appointmentDate: string;
@@ -21,6 +27,7 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
 }) => {
   const [existingAppointments, setExistingAppointments] = useState<any[]>([]);
   const [holidayWarning, setHolidayWarning] = useState<string | null>(null);
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
 
   // Get tomorrow's date as the minimum selectable date
   const tomorrow = new Date();
@@ -36,14 +43,22 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
     // Load existing appointments from localStorage
     const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
     setExistingAppointments(appointments);
-  }, [appointmentDate]); // Reload when date changes
+  }, [appointmentDate]);
 
-  // Available base time slots
-  const baseTimeSlots = [
-    "10:00", "10:30", "11:00", "11:30", "12:00", "12:30",
-    "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
-    "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"
-  ];
+  useEffect(() => {
+    if (serviceDuration) {
+      // Get base time slots considering service duration
+      const baseSlots = getAvailableTimeSlots(serviceDuration);
+      
+      // Filter slots based on existing appointments
+      const availableSlots = baseSlots.filter(time => 
+        isTimeSlotAvailable(appointmentDate, time, serviceDuration, existingAppointments, selectedProfessional) &&
+        isWithinBusinessHours(time, serviceDuration)
+      );
+
+      setAvailableTimeSlots(availableSlots);
+    }
+  }, [appointmentDate, serviceDuration, existingAppointments, selectedProfessional]);
 
   // Custom handler for DayPicker that properly handles timezone
   const handleDaySelect = (day: Date | undefined) => {
@@ -85,21 +100,6 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
     { after: maxDate }
   ];
 
-  // Filter available time slots based on existing appointments and service duration
-  const getAvailableTimeSlots = () => {
-    if (!appointmentDate || !serviceDuration) return [];
-    
-    return baseTimeSlots.filter(time => 
-      isTimeSlotAvailable(
-        appointmentDate, 
-        time, 
-        serviceDuration, 
-        existingAppointments,
-        selectedProfessional
-      )
-    );
-  };
-
   // Custom CSS for the calendar
   const calendarClassNames = {
     months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
@@ -126,7 +126,6 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
 
   // Parse the selected date for the calendar
   const selectedDate = appointmentDate ? new Date(appointmentDate + 'T00:00:00') : undefined;
-  const availableTimeSlots = getAvailableTimeSlots();
 
   return (
     <div className="space-y-6">
@@ -134,6 +133,15 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
         <CalendarIcon className="w-5 h-5 mr-2" />
         Select Date & Time
       </h2>
+
+      <div className="bg-glamour-light/50 p-4 rounded-lg">
+        <p className="text-gray-600">
+          <span className="font-medium">Business Hours:</span> {formatTimeDisplay(BUSINESS_HOURS.open)} - {formatTimeDisplay(BUSINESS_HOURS.close)}
+        </p>
+        <p className="text-sm text-gray-500 mt-1">
+          Service duration: {serviceDuration} minutes
+        </p>
+      </div>
 
       {holidayWarning && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2 text-yellow-700 mb-6">
@@ -185,7 +193,7 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
                   className="sr-only"
                 />
                 <Clock className="w-4 h-4 mr-1 text-gray-400" />
-                <span className="text-sm">{time}</span>
+                <span className="text-sm">{formatTimeDisplay(time)}</span>
               </label>
             ))}
           </div>

@@ -6,6 +6,7 @@ import PersonalInfo from './booking/PersonalInfo';
 import ServiceSelect from './booking/ServiceSelect';
 import ProfessionalSelect from './booking/ProfessionalSelect';
 import DateTimeSelect from './booking/DateTimeSelect';
+import BookingConfirmation from './booking/BookingConfirmation';
 import { services } from '../data/services';
 
 const Booking: FC = () => {
@@ -61,40 +62,63 @@ const Booking: FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        if (!formData.clientName?.trim()) {
+          setError('Please enter your name');
+          return false;
+        }
+        if (!formData.clientEmail?.trim()) {
+          setError('Please enter your email address');
+          return false;
+        }
+        if (!validateEmail(formData.clientEmail)) {
+          setError('Please enter a valid email address');
+          return false;
+        }
+        if (formData.clientPhone && !validatePhone(formData.clientPhone)) {
+          setError('Please enter a valid 10-digit phone number');
+          return false;
+        }
+        if (formData.clientPhone && !formData.carrier) {
+          setError('Please select your mobile carrier for SMS notifications');
+          return false;
+        }
+        break;
+      case 2:
+        if (!formData.selectedService) {
+          setError('Please select a service');
+          return false;
+        }
+        break;
+      case 4:
+        if (!formData.appointmentDate || !formData.appointmentTime) {
+          setError('Please select appointment date and time');
+          return false;
+        }
+        break;
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => prev + 1);
+      setError('');
+    }
+  };
+
+  const handleBack = () => {
+    setCurrentStep(prev => prev - 1);
+    setError('');
+  };
+
+  const handleSubmit = async () => {
     setError('');
     setLoading(true);
 
     try {
-      if (!formData.clientName?.trim()) {
-        throw new Error('Please enter your name');
-      }
-
-      if (!formData.clientEmail?.trim()) {
-        throw new Error('Please enter your email address');
-      }
-
-      if (!validateEmail(formData.clientEmail)) {
-        throw new Error('Please enter a valid email address');
-      }
-
-      if (!formData.selectedService) {
-        throw new Error('Please select a service');
-      }
-
-      if (!formData.appointmentDate || !formData.appointmentTime) {
-        throw new Error('Please select appointment date and time');
-      }
-
-      if (formData.clientPhone && !validatePhone(formData.clientPhone)) {
-        throw new Error('Please enter a valid 10-digit phone number');
-      }
-
-      if (formData.clientPhone && !formData.carrier) {
-        throw new Error('Please select your mobile carrier for SMS notifications');
-      }
-
       if (!selectedService) {
         throw new Error('Selected service not found');
       }
@@ -137,12 +161,10 @@ const Booking: FC = () => {
       });
 
       // Navigate to home page with success state
-      setTimeout(() => {
-        navigate('/', { 
-          state: { bookingSuccess: true },
-          replace: true 
-        });
-      }, 2000);
+      navigate('/', { 
+        state: { bookingSuccess: true },
+        replace: true 
+      });
 
     } catch (err: any) {
       setError(err.message || 'Failed to book appointment. Please try again.');
@@ -156,7 +178,8 @@ const Booking: FC = () => {
     { number: 1, title: 'Personal Information' },
     { number: 2, title: 'Select Service' },
     { number: 3, title: 'Choose Stylist' },
-    { number: 4, title: 'Date & Time' }
+    { number: 4, title: 'Date & Time' },
+    { number: 5, title: 'Confirm Booking' }
   ];
 
   if (success) {
@@ -207,7 +230,7 @@ const Booking: FC = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           {error && (
             <div className="p-4 m-6 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-600">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -216,25 +239,25 @@ const Booking: FC = () => {
           )}
 
           <div className="p-6 lg:p-8">
-            <div className={`${currentStep === 1 ? 'block' : 'hidden'}`}>
+            {currentStep === 1 && (
               <PersonalInfo formData={formData} onChange={handleChange} />
-            </div>
+            )}
 
-            <div className={`${currentStep === 2 ? 'block' : 'hidden'}`}>
+            {currentStep === 2 && (
               <ServiceSelect 
                 selectedService={formData.selectedService} 
                 onChange={handleServiceChange}
               />
-            </div>
+            )}
 
-            <div className={`${currentStep === 3 ? 'block' : 'hidden'}`}>
+            {currentStep === 3 && (
               <ProfessionalSelect 
                 selectedProfessional={formData.selectedProfessional} 
                 onChange={handleChange} 
               />
-            </div>
+            )}
 
-            <div className={`${currentStep === 4 ? 'block' : 'hidden'}`}>
+            {currentStep === 4 && (
               <DateTimeSelect 
                 appointmentDate={formData.appointmentDate}
                 appointmentTime={formData.appointmentTime}
@@ -242,7 +265,16 @@ const Booking: FC = () => {
                 selectedProfessional={formData.selectedProfessional}
                 onChange={handleChange}
               />
-            </div>
+            )}
+
+            {currentStep === 5 && (
+              <BookingConfirmation
+                formData={formData}
+                selectedServiceDetails={selectedService}
+                onEdit={setCurrentStep}
+                onConfirm={handleSubmit}
+              />
+            )}
 
             {currentStep === 4 && (
               <div className="mt-8 space-y-4">
@@ -260,48 +292,28 @@ const Booking: FC = () => {
             )}
           </div>
 
-          <div className="px-6 lg:px-8 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
-            <button
-              type="button"
-              onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
-              className={`px-6 py-2 border border-glamour-gold text-glamour-gold rounded-lg hover:bg-glamour-light transition-colors ${
-                currentStep === 1 ? 'invisible' : ''
-              }`}
-            >
-              Previous
-            </button>
-            
-            {currentStep < 4 ? (
+          {currentStep < 5 && (
+            <div className="px-6 lg:px-8 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
               <button
                 type="button"
-                onClick={() => setCurrentStep(prev => Math.min(4, prev + 1))}
+                onClick={handleBack}
+                className={`px-6 py-2 border border-glamour-gold text-glamour-gold rounded-lg hover:bg-glamour-light transition-colors ${
+                  currentStep === 1 ? 'invisible' : ''
+                }`}
+              >
+                Previous
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleNext}
                 className="px-6 py-2 bg-glamour-gold text-white rounded-lg hover:bg-opacity-90 transition-colors"
               >
                 Next
               </button>
-            ) : (
-              <button
-                type="submit"
-                disabled={loading}
-                className={`px-6 py-2 bg-glamour-gold text-white rounded-lg font-semibold hover:bg-opacity-90 transition-all duration-300 ${
-                  loading ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
-              >
-                {loading ? (
-                  <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Processing...
-                  </span>
-                ) : (
-                  'Book Appointment'
-                )}
-              </button>
-            )}
-          </div>
-        </form>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
