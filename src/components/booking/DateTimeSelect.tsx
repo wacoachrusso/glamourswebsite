@@ -1,19 +1,27 @@
-import React from 'react';
-import { Calendar as CalendarIcon, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar as CalendarIcon, Clock, AlertCircle } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
+import { isHolidayDate, isTimeSlotAvailable } from '../../utils/dateUtils';
 
 interface DateTimeSelectProps {
   appointmentDate: string;
   appointmentTime: string;
+  serviceDuration: number;
+  selectedProfessional: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
   appointmentDate,
   appointmentTime,
+  serviceDuration,
+  selectedProfessional,
   onChange,
 }) => {
+  const [existingAppointments, setExistingAppointments] = useState<any[]>([]);
+  const [holidayWarning, setHolidayWarning] = useState<string | null>(null);
+
   // Get tomorrow's date as the minimum selectable date
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -24,8 +32,14 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
   maxDate.setMonth(maxDate.getMonth() + 3);
   maxDate.setHours(23, 59, 59, 999);
 
-  // Available time slots
-  const timeSlots = [
+  useEffect(() => {
+    // Load existing appointments from localStorage
+    const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+    setExistingAppointments(appointments);
+  }, [appointmentDate]); // Reload when date changes
+
+  // Available base time slots
+  const baseTimeSlots = [
     "10:00", "10:30", "11:00", "11:30", "12:00", "12:30",
     "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
     "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"
@@ -34,6 +48,14 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
   // Custom handler for DayPicker that properly handles timezone
   const handleDaySelect = (day: Date | undefined) => {
     if (day) {
+      // Check if it's a holiday
+      const { isHoliday, holidayName } = isHolidayDate(day);
+      if (isHoliday) {
+        setHolidayWarning(`Note: The salon might be closed on ${holidayName}. Please call (973) 344-5199 to confirm availability.`);
+      } else {
+        setHolidayWarning(null);
+      }
+
       // Create a new date object and set it to midnight in local timezone
       const localDate = new Date(day);
       localDate.setHours(0, 0, 0, 0);
@@ -45,6 +67,15 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
         }
       } as React.ChangeEvent<HTMLInputElement>;
       onChange(event);
+
+      // Clear time when date changes
+      const timeEvent = {
+        target: {
+          name: 'appointmentTime',
+          value: ''
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      onChange(timeEvent);
     }
   };
 
@@ -53,6 +84,21 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
     { before: tomorrow },
     { after: maxDate }
   ];
+
+  // Filter available time slots based on existing appointments and service duration
+  const getAvailableTimeSlots = () => {
+    if (!appointmentDate || !serviceDuration) return [];
+    
+    return baseTimeSlots.filter(time => 
+      isTimeSlotAvailable(
+        appointmentDate, 
+        time, 
+        serviceDuration, 
+        existingAppointments,
+        selectedProfessional
+      )
+    );
+  };
 
   // Custom CSS for the calendar
   const calendarClassNames = {
@@ -80,6 +126,7 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
 
   // Parse the selected date for the calendar
   const selectedDate = appointmentDate ? new Date(appointmentDate + 'T00:00:00') : undefined;
+  const availableTimeSlots = getAvailableTimeSlots();
 
   return (
     <div className="space-y-6">
@@ -87,6 +134,13 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
         <CalendarIcon className="w-5 h-5 mr-2" />
         Select Date & Time
       </h2>
+
+      {holidayWarning && (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2 text-yellow-700 mb-6">
+          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          <p>{holidayWarning}</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Calendar */}
@@ -113,7 +167,7 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
             Available Time Slots
           </h3>
           <div className="grid grid-cols-3 gap-2 max-h-[400px] overflow-y-auto p-1">
-            {timeSlots.map((time) => (
+            {availableTimeSlots.map((time) => (
               <label
                 key={time}
                 className={`relative flex items-center justify-center p-2 border rounded-lg cursor-pointer transition-all duration-300 ${
@@ -138,6 +192,11 @@ const DateTimeSelect: React.FC<DateTimeSelectProps> = ({
           <p className="text-sm text-gray-500 mt-2">
             All appointments are in Eastern Time (ET)
           </p>
+          {appointmentDate && availableTimeSlots.length === 0 && (
+            <p className="text-sm text-red-600 mt-2">
+              No available time slots for this date. Please select another date.
+            </p>
+          )}
         </div>
       </div>
     </div>

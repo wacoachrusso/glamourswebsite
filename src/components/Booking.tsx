@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, AlertCircle } from 'lucide-react';
 import { sendConfirmationEmail } from '../services/emailService';
@@ -8,7 +8,7 @@ import ProfessionalSelect from './booking/ProfessionalSelect';
 import DateTimeSelect from './booking/DateTimeSelect';
 import { services } from '../data/services';
 
-const Booking = () => {
+const Booking: FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     clientName: '',
@@ -26,6 +26,9 @@ const Booking = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Get selected service details
+  const selectedService = services.find(s => s.id === formData.selectedService);
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -92,7 +95,6 @@ const Booking = () => {
         throw new Error('Please select your mobile carrier for SMS notifications');
       }
 
-      const selectedService = services.find(s => s.id === formData.selectedService);
       if (!selectedService) {
         throw new Error('Selected service not found');
       }
@@ -101,7 +103,7 @@ const Booking = () => {
         to_name: formData.clientName.trim(),
         to_email: formData.clientEmail.trim(),
         service_name: selectedService.name,
-        stylist_name: formData.selectedProfessional || 'Our Expert Stylist',
+        stylist_name: formData.selectedProfessional || '',
         appointment_date: new Date(formData.appointmentDate).toLocaleDateString(),
         appointment_time: formData.appointmentTime,
         phone_number: formData.clientPhone?.trim() || 'Not provided',
@@ -115,6 +117,7 @@ const Booking = () => {
       appointments.push({
         id: Date.now(),
         ...formData,
+        service: selectedService,
         status: 'PENDING',
         createdAt: new Date().toISOString()
       });
@@ -235,6 +238,8 @@ const Booking = () => {
               <DateTimeSelect 
                 appointmentDate={formData.appointmentDate}
                 appointmentTime={formData.appointmentTime}
+                serviceDuration={selectedService ? parseInt(selectedService.duration) : 60}
+                selectedProfessional={formData.selectedProfessional}
                 onChange={handleChange}
               />
             </div>
