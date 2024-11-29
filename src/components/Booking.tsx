@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, AlertCircle } from 'lucide-react';
-import { sendConfirmationEmail } from '../services/emailService';
+import { sendConfirmationAndStylistEmails } from '../services/emailService'; // Updated import
 import PersonalInfo from './booking/PersonalInfo';
 import ServiceSelect from './booking/ServiceSelect';
 import ProfessionalSelect from './booking/ProfessionalSelect';
@@ -25,7 +25,6 @@ const Booking: FC = () => {
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
   // Get selected service details
@@ -116,18 +115,18 @@ const Booking: FC = () => {
 
   const handleSubmit = async () => {
     setError('');
-    setLoading(true);
 
     try {
       if (!selectedService) {
         throw new Error('Selected service not found');
       }
 
-      await sendConfirmationEmail({
+      await sendConfirmationAndStylistEmails({
         to_name: formData.clientName.trim(),
         to_email: formData.clientEmail.trim(),
         service_name: selectedService.name,
         stylist_name: formData.selectedProfessional || '',
+        stylist_email: formData.selectedProfessional ? formData.clientEmail.trim() : '', // Assuming professional's email is stored in formData
         appointment_date: new Date(formData.appointmentDate).toLocaleDateString(),
         appointment_time: formData.appointmentTime,
         phone_number: formData.clientPhone?.trim() || 'Not provided',
@@ -169,8 +168,6 @@ const Booking: FC = () => {
     } catch (err: any) {
       setError(err.message || 'Failed to book appointment. Please try again.');
       console.error('Booking error:', err);
-    } finally {
-      setLoading(false);
     }
   };
 

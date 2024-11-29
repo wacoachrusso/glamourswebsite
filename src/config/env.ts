@@ -1,6 +1,6 @@
-// EmailJS Configuration
 export const emailConfig = {
-  publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '2g5IRRgglD-GokQVj',
-  templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_ud1l1yi',
-  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_odh2gob'
+  publicKey: '2g5IRRgglD-GokQVj', // VITE_EMAILJS_PUBLIC_KEY
+  serviceId: 'service_odh2gob',    // VITE_EMAILJS_SERVICE_ID
+  clientConfirmationTemplateId: 'template_ud1l1yi', // Template ID for client confirmation
+  stylistNotificationTemplateId: 'template_tab10gb' // Update this with the stylist notification template ID
 };
