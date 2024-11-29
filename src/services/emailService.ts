@@ -41,10 +41,11 @@ export const sendConfirmationEmail = async (templateParams: EmailTemplateParams)
 
     // Format the template parameters to match exactly with the template variables
     const formattedParams = {
-      from_name: templateParams.to_name.trim(),
+      from_name: "Glamour's Beauty Salon",
       user_name: templateParams.to_name.trim(),
       user_email: templateParams.to_email.trim(),
       service_name: templateParams.service_name,
+      stylist_name: templateParams.stylist_name,
       appointment_date: templateParams.appointment_date,
       appointment_time: templateParams.appointment_time,
       salon_address: templateParams.salon_address,
