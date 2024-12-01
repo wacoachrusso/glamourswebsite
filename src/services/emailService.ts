@@ -7,7 +7,7 @@ interface EmailTemplateParams {
   to_email: string;
   service_name: string;
   stylist_name: string;
-  stylist_email: string;
+  stylist_email?: string;
   appointment_date: string;
   appointment_time: string;
   phone_number: string;
@@ -18,56 +18,35 @@ interface EmailTemplateParams {
 }
 
 const createSMSMessage = (params: EmailTemplateParams): string => {
-  // Create a concise SMS message within 160 characters
+  const stylistInfo = params.stylist_name ? `\nStylist: ${params.stylist_name}` : '';
   return `Glamour's Salon Appt Confirmed:
 ${params.appointment_date} @ ${params.appointment_time}
-Service: ${params.service_name}
-Stylist: ${params.stylist_name}
+Service: ${params.service_name}${stylistInfo}
 Questions? Call ${params.salon_phone}`;
 };
 
 export const sendConfirmationAndStylistEmails = async (templateParams: EmailTemplateParams) => {
   try {
-    // Validate required email parameters
-    if (!templateParams.to_email?.trim()) {
-      throw new Error('Client email address is required');
-    }
-
-    if (!templateParams.to_name?.trim()) {
-      throw new Error('Client name is required');
-    }
-
-    if (!templateParams.stylist_email?.trim()) {
-      throw new Error('Stylist email address is required');
-    }
-
     // Initialize EmailJS
     emailjs.init(emailConfig.publicKey);
 
-    // Common template parameters
-    const commonParams = {
-      from_name: "Glamour's Beauty Salon",
-      service_name: templateParams.service_name,
-      appointment_date: templateParams.appointment_date,
-      appointment_time: templateParams.appointment_time,
-      salon_address: templateParams.salon_address,
-      salon_phone: templateParams.salon_phone,
-      notes: templateParams.notes || 'No special notes',
-      phone: templateParams.phone_number || 'Not provided'
-    };
-
-    // Client email parameters
-    const clientParams = {
-      ...commonParams,
-      user_name: templateParams.to_name.trim(), // Client name
-      user_email: templateParams.to_email.trim() // Client email
-    };
+    console.log('Sending client confirmation email with parameters:', templateParams);
 
     // Send client confirmation email
     const clientResponse = await emailjs.send(
       emailConfig.serviceId,
       emailConfig.clientConfirmationTemplateId,
-      clientParams
+      {
+        to_name: templateParams.to_name,
+        to_email: templateParams.to_email,
+        service_name: templateParams.service_name,
+        stylist_name: templateParams.stylist_name,
+        appointment_date: templateParams.appointment_date,
+        appointment_time: templateParams.appointment_time,
+        salon_phone: templateParams.salon_phone,
+        salon_address: templateParams.salon_address,
+        notes: templateParams.notes
+      }
     );
 
     if (clientResponse.status !== 200) {
@@ -75,48 +54,74 @@ export const sendConfirmationAndStylistEmails = async (templateParams: EmailTemp
     }
     console.log('Client confirmation email sent successfully:', clientResponse);
 
-    // Stylist email parameters
-    const stylistParams = {
-      ...commonParams,
-      stylist_name: templateParams.stylist_name, // Stylist name
-      user_name: templateParams.stylist_name, // Stylist name (used in template)
-      user_email: templateParams.stylist_email.trim() // Stylist email
-    };
+    // Only send stylist notification if a stylist was selected and has an email
+    const stylistEmail = templateParams.stylist_email || 'loufranktv@gmail.com';
+    if (stylistEmail && templateParams.stylist_name !== 'Next Available Stylist') {
+      try {
+        console.log('Sending stylist notification email with parameters:', {
+          stylist_email: stylistEmail,
+          stylist_name: templateParams.stylist_name,
+          client_name: templateParams.to_name,
+          client_email: templateParams.to_email,
+          client_phone: templateParams.phone_number,
+          service_name: templateParams.service_name,
+          appointment_date: templateParams.appointment_date,
+          appointment_time: templateParams.appointment_time,
+          notes: templateParams.notes,
+          salon_phone: templateParams.salon_phone,
+          salon_address: templateParams.salon_address
+        });
 
-    // Send stylist notification email
-    const stylistResponse = await emailjs.send(
-      emailConfig.serviceId,
-      emailConfig.stylistNotificationTemplateId,
-      stylistParams
-    );
-
-    if (stylistResponse.status !== 200) {
-      throw new Error(`Stylist EmailJS failed with status: ${stylistResponse.status}`);
+        await emailjs.send(
+          emailConfig.serviceId,
+          emailConfig.stylistNotificationTemplateId,
+          {
+            to_email: stylistEmail,
+            stylist_name: templateParams.stylist_name,
+            client_name: templateParams.to_name,
+            client_email: templateParams.to_email,
+            client_phone: templateParams.phone_number,
+            service_name: templateParams.service_name,
+            appointment_date: templateParams.appointment_date,
+            appointment_time: templateParams.appointment_time,
+            notes: templateParams.notes || 'No special notes',
+            salon_phone: templateParams.salon_phone,
+            salon_address: templateParams.salon_address
+          }
+        );
+        console.log('Stylist notification email sent successfully');
+      } catch (error) {
+        console.error('Failed to send stylist notification:', error);
+        // Don't throw here as the main booking was successful
+      }
     }
-    console.log('Stylist notification email sent successfully:', stylistResponse);
 
     // Send SMS confirmation if phone and carrier are provided
     if (templateParams.phone_number && templateParams.carrier) {
       const smsAddress = getSMSAddress(templateParams.phone_number, templateParams.carrier);
-      
-      if (smsAddress) {
-        const smsParams = {
-          ...clientParams,
-          user_email: smsAddress,
-          message: createSMSMessage(templateParams)
-        };
 
-        await emailjs.send(
-          emailConfig.serviceId,
-          emailConfig.clientConfirmationTemplateId,
-          smsParams
-        );
+      if (smsAddress) {
+        try {
+          console.log('Sending SMS notification to:', smsAddress);
+          await emailjs.send(
+            emailConfig.serviceId,
+            emailConfig.clientConfirmationTemplateId,
+            {
+              to_email: smsAddress,
+              message: createSMSMessage(templateParams)
+            }
+          );
+          console.log('SMS notification sent successfully');
+        } catch (error) {
+          console.error('Failed to send SMS notification:', error);
+          // Don't throw here as the main booking was successful
+        }
       }
     }
 
-    return { clientResponse, stylistResponse };
+    return { success: true };
   } catch (error: any) {
     console.error('Error sending emails:', error);
-    throw new Error(error.message || 'Failed to send emails. Please try again.');
+    throw new Error('Failed to send confirmation email. Please try again.');
   }
 };
