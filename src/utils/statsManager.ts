@@ -27,12 +27,20 @@ const INITIAL_STATS: DashboardStats = {
 
 export const getStats = (): DashboardStats => {
   const stats = localStorage.getItem('dashboardStats');
-  return stats ? JSON.parse(stats, (key, value) => {
-    if (key === 'clients') {
-      return new Set(value);
-    }
-    return value;
-  }) : INITIAL_STATS;
+  if (!stats) return INITIAL_STATS;
+  
+  const parsedStats = JSON.parse(stats);
+  
+  // Convert clients arrays back to Sets
+  if (parsedStats.stylistStats) {
+    Object.keys(parsedStats.stylistStats).forEach(stylist => {
+      if (parsedStats.stylistStats[stylist].clients) {
+        parsedStats.stylistStats[stylist].clients = new Set(parsedStats.stylistStats[stylist].clients);
+      }
+    });
+  }
+  
+  return parsedStats;
 };
 
 export const resetStats = () => {

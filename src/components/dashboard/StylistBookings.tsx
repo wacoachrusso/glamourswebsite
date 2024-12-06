@@ -11,8 +11,8 @@ interface StylistBooking {
   clientPhone: string;
   service: {
     name: string;
-    price: string;
-    duration: string;
+    price?: string;
+    duration?: string;
   };
   appointmentDate: string;
   appointmentTime: string;
@@ -48,14 +48,14 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
       booking.id === id ? { ...booking, status: newStatus } : booking
     );
     localStorage.setItem('appointments', JSON.stringify(updatedBookings));
-    window.location.reload(); // Refresh to show updated status
+    window.location.reload();
   };
 
   const handleDelete = (id: number) => {
     const allBookings = JSON.parse(localStorage.getItem('appointments') || '[]');
     const updatedBookings = allBookings.filter((booking: any) => booking.id !== id);
     localStorage.setItem('appointments', JSON.stringify(updatedBookings));
-    window.location.reload(); // Refresh to show updated list
+    window.location.reload();
   };
 
   const handleMessage = async (message: string) => {
@@ -75,6 +75,7 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
         salon_address: '275 Adams St, Newark, NJ 07105'
       });
       alert('Message sent successfully!');
+      setMessageRecipient(null);
     } catch (error) {
       console.error('Failed to send message:', error);
       alert('Failed to send message. Please try again.');

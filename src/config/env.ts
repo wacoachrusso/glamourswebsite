@@ -9,7 +9,6 @@ export const emailConfig = {
   templateId: 'template_ud1l1yi'
 };
 
-// Validate email configuration
 export const isEmailConfigValid = (): boolean => {
   return !!(
     emailConfig.publicKey &&
