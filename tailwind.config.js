@@ -23,17 +23,10 @@ export default {
         'float': 'float 3s ease-in-out infinite',
         'fade-in': 'fadeIn 0.6s ease-out forwards',
         'pulse-slow': 'pulse 3s infinite',
-        'shimmer': 'shimmer 3s infinite',
       },
       fontFamily: {
         'display': ['Inter', 'sans-serif'],
         'body': ['Inter', 'sans-serif'],
-      },
-      keyframes: {
-        shimmer: {
-          '0%': { backgroundPosition: '-200% center' },
-          '100%': { backgroundPosition: '200% center' },
-        },
       },
     },
     container: {
