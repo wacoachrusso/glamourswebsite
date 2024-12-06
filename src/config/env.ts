@@ -1,8 +1,3 @@
-const getEnvVar = (key: string): string => {
-  const value = import.meta.env[key];
-  return value || '';
-};
-
 export const emailConfig = {
   publicKey: '2g5IRRgglD-GokQVj',
   serviceId: 'service_odh2gob',

@@ -1,24 +1,9 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, User, Phone, Mail, MessageSquare } from 'lucide-react';
+import { Calendar, Clock, Mail, Phone, MessageSquare } from 'lucide-react';
 import AppointmentActions from './AppointmentActions';
 import MessageModal from './MessageModal';
 import { sendConfirmationAndStylistEmails } from '../../services/emailService';
-
-interface StylistBooking {
-  id: number;
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  service: {
-    name: string;
-    price?: string;
-    duration?: string;
-  };
-  appointmentDate: string;
-  appointmentTime: string;
-  notes: string;
-  status: string;
-}
+import { AppointmentData } from '../../types/appointment';
 
 interface StylistBookingsProps {
   stylistName: string;
@@ -33,9 +18,9 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
     phone: string;
   } | null>(null);
 
-  const getBookings = (): StylistBooking[] => {
+  const getBookings = (): AppointmentData[] => {
     const allBookings = JSON.parse(localStorage.getItem('appointments') || '[]');
-    return allBookings.filter((booking: any) => 
+    return allBookings.filter((booking: AppointmentData) => 
       booking.selectedProfessional === stylistName
     );
   };
@@ -44,7 +29,7 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
 
   const handleStatusChange = (id: number, newStatus: string) => {
     const allBookings = JSON.parse(localStorage.getItem('appointments') || '[]');
-    const updatedBookings = allBookings.map((booking: any) =>
+    const updatedBookings = allBookings.map((booking: AppointmentData) =>
       booking.id === id ? { ...booking, status: newStatus } : booking
     );
     localStorage.setItem('appointments', JSON.stringify(updatedBookings));
@@ -53,7 +38,7 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
 
   const handleDelete = (id: number) => {
     const allBookings = JSON.parse(localStorage.getItem('appointments') || '[]');
-    const updatedBookings = allBookings.filter((booking: any) => booking.id !== id);
+    const updatedBookings = allBookings.filter((booking: AppointmentData) => booking.id !== id);
     localStorage.setItem('appointments', JSON.stringify(updatedBookings));
     window.location.reload();
   };
@@ -92,7 +77,7 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
     }
   };
 
-  const formatDate = (dateStr: string) => {
+  const formatDate = (dateStr: string): string => {
     try {
       return new Date(dateStr).toLocaleDateString('en-US', {
         weekday: 'short',
@@ -105,7 +90,7 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
     }
   };
 
-  const formatTime = (timeStr: string) => {
+  const formatTime = (timeStr: string): string => {
     try {
       const [hours, minutes] = timeStr.split(':');
       const date = new Date();
