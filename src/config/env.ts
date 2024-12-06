@@ -1,11 +1,19 @@
-const getEnvVar = (key: string, defaultValue: string = ''): string => {
+const getEnvVar = (key: string): string => {
   const value = import.meta.env[key];
-  return value !== undefined ? value : defaultValue;
+  return value || '';
 };
 
 export const emailConfig = {
-  publicKey: getEnvVar('VITE_EMAILJS_PUBLIC_KEY', 'demo_key'),
-  serviceId: getEnvVar('VITE_EMAILJS_SERVICE_ID', 'demo_service'),
-  clientConfirmationTemplateId: getEnvVar('VITE_EMAILJS_CLIENT_CONFIRMATION_TEMPLATE_ID', 'demo_template'),
-  stylistNotificationTemplateId: getEnvVar('VITE_EMAILJS_STYLIST_NOTIFICATION_TEMPLATE_ID', 'demo_template'),
+  publicKey: '2g5IRRgglD-GokQVj',
+  serviceId: 'service_odh2gob',
+  templateId: 'template_ud1l1yi'
+};
+
+// Validate email configuration
+export const isEmailConfigValid = (): boolean => {
+  return !!(
+    emailConfig.publicKey &&
+    emailConfig.serviceId &&
+    emailConfig.templateId
+  );
 };
