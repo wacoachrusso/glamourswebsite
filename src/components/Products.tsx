@@ -1,5 +1,6 @@
 import React from 'react';
 import { Star, Shield, Award } from 'lucide-react';
+import { IMAGES } from '../config/images';
 
 const Products: React.FC = () => {
   const products = [
@@ -9,12 +10,12 @@ const Products: React.FC = () => {
         {
           name: 'Kerastase Luxury Hair Care',
           description: 'Professional-grade shampoos, conditioners, and treatments',
-          image: 'https://images.unsplash.com/photo-1597354984706-fac992d9306f?auto=format&fit=crop&w=800&q=80'
+          image: IMAGES.services.hairCuts.women
         },
         {
           name: 'Olaplex Treatment System',
           description: 'Revolutionary bond-building hair care products',
-          image: 'https://images.unsplash.com/photo-1631730359585-38a4935cbea3?auto=format&fit=crop&w=800&q=80'
+          image: IMAGES.services.balayage.main
         }
       ]
     },
@@ -24,12 +25,12 @@ const Products: React.FC = () => {
         {
           name: 'Moroccan Oil Collection',
           description: 'Luxury oils and styling products for all hair types',
-          image: 'https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=800&q=80'
+          image: IMAGES.services.specialOccasions.main
         },
         {
           name: 'Professional Styling Tools',
           description: 'High-end brushes, combs, and accessories',
-          image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80'
+          image: IMAGES.services.braids.main
         }
       ]
     }
