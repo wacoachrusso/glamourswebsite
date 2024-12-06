@@ -2,9 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #fff5f7;
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #fff5f7;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply relative;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-[-2px] left-1/2 w-0 h-0.5 bg-gradient-to-r from-glamour-gold to-glamour-pink transition-all duration-300 -translate-x-1/2;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  .service-card {
+    @apply transition-all duration-300;
+  }
+
+  .service-card:hover {
+    @apply -translate-y-1 shadow-lg;
+  }
+
+  .image-hover {
+    @apply overflow-hidden;
+  }
+
+  .image-hover img {
+    @apply transition-transform duration-500;
+  }
+
+  .image-hover:hover img {
+    @apply scale-110;
+  }
+
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/80;
+  }
+
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@layer utilities {
+  .scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.glamour.gold') theme('colors.gray.100');
+  }
+
+  .scrollbar::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-b from-glamour-gold to-glamour-pink rounded-full;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply from-glamour-gold/90 to-glamour-pink/90;
+  }
 }
 
 @keyframes shimmer {
@@ -50,72 +118,4 @@ body {
 
 .animate-float {
   animation: float 4s ease-in-out infinite;
-}
-
-.nav-link {
-  position: relative;
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(to right, #d4af37, #ffd1dc);
-  transition: all 0.3s ease;
-  transform: translateX(-50%);
-}
-
-.nav-link:hover::after {
-  width: 100%;
-}
-
-.service-card {
-  transition: all 0.3s ease;
-}
-
-.service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.image-hover {
-  overflow: hidden;
-}
-
-.image-hover img {
-  transition: transform 0.5s ease;
-}
-
-.image-hover:hover img {
-  transform: scale(1.1);
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #d4af37, #ffd1dc);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #b38f2d, #ffb6c1);
-}
-
-.glass-effect {
-  backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.text-shadow {
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
