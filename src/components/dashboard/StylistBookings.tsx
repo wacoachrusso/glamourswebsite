@@ -4,7 +4,6 @@ import AppointmentActions from './AppointmentActions';
 import MessageModal from './MessageModal';
 import { sendConfirmationAndStylistEmails } from '../../services/emailService';
 import { AppointmentData } from '../../types/appointment';
-import { StaffMember } from '../../types/user';
 
 interface StylistBookingsProps {
   stylistName: string;
