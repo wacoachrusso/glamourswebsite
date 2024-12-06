@@ -48,14 +48,14 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
       booking.id === id ? { ...booking, status: newStatus } : booking
     );
     localStorage.setItem('appointments', JSON.stringify(updatedBookings));
-    window.location.reload();
+    window.location.reload(); // Refresh to show updated status
   };
 
   const handleDelete = (id: number) => {
     const allBookings = JSON.parse(localStorage.getItem('appointments') || '[]');
     const updatedBookings = allBookings.filter((booking: any) => booking.id !== id);
     localStorage.setItem('appointments', JSON.stringify(updatedBookings));
-    window.location.reload();
+    window.location.reload(); // Refresh to show updated list
   };
 
   const handleMessage = async (message: string) => {
@@ -91,15 +91,41 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
     }
   };
 
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateStr;
+    }
+  };
+
+  const formatTime = (timeStr: string) => {
+    try {
+      const [hours, minutes] = timeStr.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours, 10));
+      date.setMinutes(parseInt(minutes, 10));
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch (error) {
+      return timeStr;
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div className="flex items-center">
-          <User className="w-6 h-6 text-glamour-gold mr-2" />
-          <h2 className="text-xl font-semibold text-glamour-dark">
-            Bookings for {stylistName}
-          </h2>
-        </div>
+        <h2 className="text-xl font-semibold text-glamour-dark">
+          Bookings for {stylistName}
+        </h2>
         <div className="flex gap-4">
           <select
             value={viewMode}
@@ -156,11 +182,11 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex items-center text-gray-600">
                     <Calendar className="w-4 h-4 mr-2" />
-                    {new Date(booking.appointmentDate).toLocaleDateString()}
+                    {formatDate(booking.appointmentDate)}
                   </div>
                   <div className="flex items-center text-gray-600">
                     <Clock className="w-4 h-4 mr-2" />
-                    {booking.appointmentTime}
+                    {formatTime(booking.appointmentTime)}
                   </div>
                   <div className="flex items-center text-gray-600">
                     <Mail className="w-4 h-4 mr-2" />

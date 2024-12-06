@@ -12,7 +12,6 @@ export interface DashboardStats {
       appointments: number;
       clients: Set<string>;
       rating: number;
-      lastUpdated: string;
     }
   }
 }
@@ -44,7 +43,6 @@ export const updateStatsFromBookings = () => {
   const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
   const stats: DashboardStats = { ...INITIAL_STATS };
   const uniqueClients = new Set<string>();
-  const currentDate = format(new Date(), 'yyyy-MM-dd');
 
   appointments.forEach((appointment: any) => {
     // Update global stats
@@ -61,15 +59,13 @@ export const updateStatsFromBookings = () => {
           revenue: 0,
           appointments: 0,
           clients: new Set<string>(),
-          rating: 4.8,
-          lastUpdated: currentDate
+          rating: 4.8 // Default rating
         };
       }
 
       stats.stylistStats[stylist].revenue += parseFloat(appointment.service.price || '0');
       stats.stylistStats[stylist].appointments++;
       stats.stylistStats[stylist].clients.add(appointment.clientEmail);
-      stats.stylistStats[stylist].lastUpdated = currentDate;
     }
   });
 

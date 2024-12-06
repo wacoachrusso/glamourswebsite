@@ -14,6 +14,7 @@ const EmployeeLogin: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prevState => ({ ...prevState, [name]: value }));
+    // Clear error when user starts typing
     if (error) setError('');
   };
 
@@ -23,18 +24,23 @@ const EmployeeLogin: React.FC = () => {
     setLoading(true);
 
     try {
+      // Demo credentials check
       if (formData.email === 'admin@glamours.com' && formData.password === 'admin123') {
+        // Simulate API delay for better UX
         await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Set auth token and user info
         localStorage.setItem('token', 'demo-token');
         localStorage.setItem('userRole', 'ADMIN');
+        
+        setLoading(false);
         navigate('/employee-dashboard');
       } else {
         throw new Error('Invalid credentials');
       }
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
-    } finally {
       setLoading(false);
+      setError('Invalid email or password. Please try again.');
     }
   };
 
@@ -42,11 +48,6 @@ const EmployeeLogin: React.FC = () => {
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
-          <img 
-            src="/images/logo.png"
-            alt="Glamour's Beauty Salon"
-            className="h-24 mx-auto mb-4"
-          />
           <h1 className="text-3xl font-bold text-glamour-dark mb-2">Staff Portal</h1>
           <p className="text-gray-600">Access your employee dashboard</p>
         </div>
