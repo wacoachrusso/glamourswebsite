@@ -24,6 +24,14 @@ const DashboardLayout: React.FC = () => {
   const [selectedStylist, setSelectedStylist] = useState<string>('');
   const navigate = useNavigate();
 
+  // Check for authentication
+  React.useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/employee-login');
+    }
+  }, [navigate]);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
