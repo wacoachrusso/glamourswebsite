@@ -49,7 +49,7 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({
         onClick={() => onMessage({ name: clientName, email: clientEmail, phone: clientPhone })}
         className="flex items-center px-3 py-1 text-sm bg-glamour-gold text-white rounded-lg hover:bg-opacity-90 transition-colors"
       >
-        <MessageSquare className="w-4 h-4 mr-1" />
+        <Send className="w-4 h-4 mr-1" />
         Message
       </button>
 
