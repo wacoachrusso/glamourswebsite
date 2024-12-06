@@ -16,12 +16,10 @@ import ClientManagement from './ClientManagement';
 import ServiceTracking from './ServiceTracking';
 import Reports from './Reports';
 import Communications from './Communications';
-import StylistDashboard from './StylistDashboard';
 
 const DashboardLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [selectedStylist, setSelectedStylist] = useState<string>('');
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -39,38 +37,10 @@ const DashboardLayout: React.FC = () => {
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
-  const stylists = [
-    'Angie Padilla',
-    'Sarah Johnson',
-    'Isabella Rodriguez',
-    'Michael Chen'
-  ];
-
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
-              <select
-                value={selectedStylist}
-                onChange={(e) => setSelectedStylist(e.target.value)}
-                className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-glamour-gold/50 focus:border-glamour-gold"
-              >
-                <option value="">All Stylists</option>
-                {stylists.map((stylist) => (
-                  <option key={stylist} value={stylist}>{stylist}</option>
-                ))}
-              </select>
-            </div>
-            {selectedStylist ? (
-              <StylistDashboard stylistName={selectedStylist} />
-            ) : (
-              <DashboardStats />
-            )}
-          </div>
-        );
+        return <DashboardStats />;
       case 'clients':
         return <ClientManagement />;
       case 'services':

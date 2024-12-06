@@ -1,7 +1,7 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, AlertCircle } from 'lucide-react';
-import { sendConfirmationAndStylistEmails } from '../services/emailService';
+import { sendConfirmationAndStylistEmails } from '../services/emailService'; // Updated import
 import PersonalInfo from './booking/PersonalInfo';
 import ServiceSelect from './booking/ServiceSelect';
 import ProfessionalSelect from './booking/ProfessionalSelect';
@@ -9,21 +9,9 @@ import DateTimeSelect from './booking/DateTimeSelect';
 import BookingConfirmation from './booking/BookingConfirmation';
 import { services } from '../data/services';
 
-interface FormData {
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  carrier: string;
-  selectedService: string;
-  selectedProfessional: string;
-  appointmentDate: string;
-  appointmentTime: string;
-  notes: string;
-}
-
 const Booking: FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     clientName: '',
     clientEmail: '',
     clientPhone: '',
@@ -39,7 +27,13 @@ const Booking: FC = () => {
   const [success, setSuccess] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
+  // Get selected service details
   const selectedService = services.find(s => s.id === formData.selectedService);
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -131,7 +125,8 @@ const Booking: FC = () => {
         to_name: formData.clientName.trim(),
         to_email: formData.clientEmail.trim(),
         service_name: selectedService.name,
-        stylist_name: formData.selectedProfessional || 'Next Available Stylist',
+        stylist_name: formData.selectedProfessional || '',
+        stylist_email: formData.selectedProfessional ? formData.clientEmail.trim() : '', // Assuming professional's email is stored in formData
         appointment_date: new Date(formData.appointmentDate).toLocaleDateString(),
         appointment_time: formData.appointmentTime,
         phone_number: formData.clientPhone?.trim() || 'Not provided',
@@ -140,6 +135,16 @@ const Booking: FC = () => {
         salon_phone: '(973) 344-5199',
         salon_address: '275 Adams St, Newark, NJ 07105'
       });
+
+      const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+      appointments.push({
+        id: Date.now(),
+        ...formData,
+        service: selectedService,
+        status: 'PENDING',
+        createdAt: new Date().toISOString()
+      });
+      localStorage.setItem('appointments', JSON.stringify(appointments));
 
       setSuccess(true);
       setFormData({
@@ -154,6 +159,7 @@ const Booking: FC = () => {
         notes: ''
       });
 
+      // Navigate to home page with success state
       navigate('/', { 
         state: { bookingSuccess: true },
         replace: true 
@@ -198,6 +204,7 @@ const Booking: FC = () => {
           <p className="text-xl text-gray-600">Schedule your visit with our expert stylists</p>
         </div>
 
+        {/* Progress Steps */}
         <div className="hidden lg:flex items-center justify-center mb-12">
           <div className="flex items-center w-full max-w-4xl justify-between relative">
             <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-gray-200 -translate-y-1/2" />
