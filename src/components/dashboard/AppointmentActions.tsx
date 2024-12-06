@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MessageSquare, Trash2, X, Check } from 'lucide-react';
+import { updateAppointmentStatus, updateStatsFromBookings } from '../../utils/statsManager';
 
 interface AppointmentActionsProps {
   appointmentId: number;
@@ -24,9 +25,16 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({
 }) => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
+  const handleStatusChange = (newStatus: string) => {
+    onStatusChange(appointmentId, newStatus);
+    updateAppointmentStatus(appointmentId, newStatus);
+    updateStatsFromBookings();
+  };
+
   const handleDelete = () => {
     if (showConfirmDelete) {
       onDelete(appointmentId);
+      updateStatsFromBookings();
     } else {
       setShowConfirmDelete(true);
     }
@@ -36,7 +44,7 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({
     <div className="mt-4 flex items-center gap-2">
       <select
         value={status}
-        onChange={(e) => onStatusChange(appointmentId, e.target.value)}
+        onChange={(e) => handleStatusChange(e.target.value)}
         className="px-3 py-1 text-sm border rounded-lg focus:ring-2 focus:ring-glamour-gold/50 focus:border-glamour-gold"
       >
         <option value="PENDING">Pending</option>
