@@ -1,5 +1,6 @@
 import emailjs from '@emailjs/browser';
 import { emailConfig, isEmailConfigValid } from '../config/env';
+import { AppointmentData } from '../types/appointment';
 
 interface EmailTemplateParams {
   to_name: string;
@@ -27,21 +28,35 @@ const validateEmailParams = (params: EmailTemplateParams): void => {
   }
 };
 
-const prepareEmailTemplate = (params: EmailTemplateParams) => {
-  return {
-    user_name: params.to_name.trim(),
-    user_email: params.to_email.trim(),
-    service: params.service_name,
-    stylist: params.stylist_name || 'Next Available Stylist',
-    date: params.appointment_date,
-    time: params.appointment_time,
-    phone: params.phone_number,
-    special_notes: params.notes || 'No special notes',
-    salon_phone: params.salon_phone,
-    salon_address: params.salon_address,
-    reply_to: 'info@glamoursbeauty.com'
-  };
-};
+const prepareEmailTemplate = (params: EmailTemplateParams) => ({
+  user_name: params.to_name.trim(),
+  user_email: params.to_email.trim(),
+  service: params.service_name,
+  stylist: params.stylist_name || 'Next Available Stylist',
+  date: params.appointment_date,
+  time: params.appointment_time,
+  phone: params.phone_number,
+  special_notes: params.notes || 'No special notes',
+  salon_phone: params.salon_phone,
+  salon_address: params.salon_address,
+  reply_to: 'info@glamoursbeauty.com'
+});
+
+const createAppointmentData = (params: EmailTemplateParams): AppointmentData => ({
+  id: Date.now(),
+  clientName: params.to_name,
+  clientEmail: params.to_email,
+  clientPhone: params.phone_number,
+  service: {
+    name: params.service_name
+  },
+  selectedProfessional: params.stylist_name,
+  appointmentDate: params.appointment_date,
+  appointmentTime: params.appointment_time,
+  notes: params.notes,
+  status: 'PENDING',
+  createdAt: new Date().toISOString()
+});
 
 export const sendConfirmationAndStylistEmails = async (templateParams: EmailTemplateParams) => {
   if (!isEmailConfigValid()) {
@@ -50,16 +65,10 @@ export const sendConfirmationAndStylistEmails = async (templateParams: EmailTemp
   }
 
   try {
-    // Validate required parameters
     validateEmailParams(templateParams);
-
-    // Initialize EmailJS with public key
     emailjs.init(emailConfig.publicKey);
-
-    // Prepare email template with validated data
+    
     const emailData = prepareEmailTemplate(templateParams);
-
-    // Send client confirmation email
     const response = await emailjs.send(
       emailConfig.serviceId,
       emailConfig.templateId,
@@ -70,23 +79,9 @@ export const sendConfirmationAndStylistEmails = async (templateParams: EmailTemp
       throw new Error(`Failed to send confirmation email: ${response.text}`);
     }
 
-    // Store appointment in localStorage with original data
     const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-    appointments.push({
-      id: Date.now(),
-      clientName: templateParams.to_name,
-      clientEmail: templateParams.to_email,
-      clientPhone: templateParams.phone_number,
-      service: {
-        name: templateParams.service_name
-      },
-      selectedProfessional: templateParams.stylist_name,
-      appointmentDate: templateParams.appointment_date,
-      appointmentTime: templateParams.appointment_time,
-      notes: templateParams.notes,
-      status: 'PENDING',
-      createdAt: new Date().toISOString()
-    });
+    const newAppointment = createAppointmentData(templateParams);
+    appointments.push(newAppointment);
     localStorage.setItem('appointments', JSON.stringify(appointments));
 
     return { success: true };

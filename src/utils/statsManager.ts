@@ -1,4 +1,11 @@
-import { format } from 'date-fns';
+import { AppointmentData } from '../types/appointment';
+
+export interface StylistStats {
+  revenue: number;
+  appointments: number;
+  clients: Set<string>;
+  rating: number;
+}
 
 export interface DashboardStats {
   totalRevenue: number;
@@ -7,12 +14,7 @@ export interface DashboardStats {
   averageServiceTime: number;
   clientRetentionRate: number;
   stylistStats: {
-    [key: string]: {
-      revenue: number;
-      appointments: number;
-      clients: Set<string>;
-      rating: number;
-    }
+    [key: string]: StylistStats;
   }
 }
 
@@ -25,17 +27,25 @@ const INITIAL_STATS: DashboardStats = {
   stylistStats: {}
 };
 
+const convertToSet = (data: any): Set<string> => {
+  if (Array.isArray(data)) {
+    return new Set(data);
+  }
+  return new Set();
+};
+
 export const getStats = (): DashboardStats => {
   const stats = localStorage.getItem('dashboardStats');
   if (!stats) return INITIAL_STATS;
   
   const parsedStats = JSON.parse(stats);
   
-  // Convert clients arrays back to Sets
   if (parsedStats.stylistStats) {
     Object.keys(parsedStats.stylistStats).forEach(stylist => {
       if (parsedStats.stylistStats[stylist].clients) {
-        parsedStats.stylistStats[stylist].clients = new Set(parsedStats.stylistStats[stylist].clients);
+        parsedStats.stylistStats[stylist].clients = convertToSet(
+          parsedStats.stylistStats[stylist].clients
+        );
       }
     });
   }
@@ -43,23 +53,23 @@ export const getStats = (): DashboardStats => {
   return parsedStats;
 };
 
-export const resetStats = () => {
+export const resetStats = (): void => {
   localStorage.setItem('dashboardStats', JSON.stringify(INITIAL_STATS));
 };
 
-export const updateStatsFromBookings = () => {
-  const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+const calculateStats = (appointments: AppointmentData[]): DashboardStats => {
   const stats: DashboardStats = { ...INITIAL_STATS };
   const uniqueClients = new Set<string>();
 
-  appointments.forEach((appointment: any) => {
-    // Update global stats
-    stats.totalRevenue += parseFloat(appointment.service.price || '0');
+  appointments.forEach((appointment) => {
+    const price = parseFloat(appointment.service.price || '0');
+    const duration = parseInt(appointment.service.duration || '0');
+
+    stats.totalRevenue += price;
     stats.totalAppointments++;
     uniqueClients.add(appointment.clientEmail);
-    stats.averageServiceTime += parseInt(appointment.service.duration || '0');
+    stats.averageServiceTime += duration;
 
-    // Update stylist stats
     if (appointment.selectedProfessional) {
       const stylist = appointment.selectedProfessional;
       if (!stats.stylistStats[stylist]) {
@@ -67,17 +77,16 @@ export const updateStatsFromBookings = () => {
           revenue: 0,
           appointments: 0,
           clients: new Set<string>(),
-          rating: 4.8 // Default rating
+          rating: 4.8
         };
       }
 
-      stats.stylistStats[stylist].revenue += parseFloat(appointment.service.price || '0');
+      stats.stylistStats[stylist].revenue += price;
       stats.stylistStats[stylist].appointments++;
       stats.stylistStats[stylist].clients.add(appointment.clientEmail);
     }
   });
 
-  // Calculate averages
   stats.totalClients = uniqueClients.size;
   stats.averageServiceTime = stats.totalAppointments > 0 
     ? stats.averageServiceTime / stats.totalAppointments 
@@ -86,7 +95,13 @@ export const updateStatsFromBookings = () => {
     ? (stats.totalAppointments / stats.totalClients) * 100 
     : 0;
 
-  // Convert Sets to arrays for storage
+  return stats;
+};
+
+export const updateStatsFromBookings = (): DashboardStats => {
+  const appointments: AppointmentData[] = JSON.parse(localStorage.getItem('appointments') || '[]');
+  const stats = calculateStats(appointments);
+
   const statsForStorage = {
     ...stats,
     stylistStats: Object.fromEntries(
