@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Trash2, X, Check, Send } from 'lucide-react';
+import { Trash2, X, Check, Send } from 'lucide-react';
 
 interface AppointmentActionsProps {
   appointmentId: number;
