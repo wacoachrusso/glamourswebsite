@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Mail, Phone, MessageSquare, Filter, Search } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Clock, Mail, Phone, MessageSquare } from 'lucide-react';
 import AppointmentActions from './AppointmentActions';
 import MessageModal from './MessageModal';
 import { sendConfirmationAndStylistEmails } from '../../services/emailService';
 import { AppointmentData } from '../../types/appointment';
-import { updateAppointmentStatus, updateStatsFromBookings } from '../../utils/statsManager';
 
 interface StylistBookingsProps {
   stylistName: string;
@@ -13,8 +12,6 @@ interface StylistBookingsProps {
 const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('day');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
   const [messageRecipient, setMessageRecipient] = useState<{
     name: string;
     email: string;
@@ -24,13 +21,7 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
   const getBookings = (): AppointmentData[] => {
     const allBookings = JSON.parse(localStorage.getItem('appointments') || '[]');
     return allBookings.filter((booking: AppointmentData) => 
-      booking.selectedProfessional === stylistName &&
-      (statusFilter === 'all' || booking.status === statusFilter) &&
-      (searchTerm === '' || 
-        booking.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.clientEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.clientPhone.includes(searchTerm)
-      )
+      booking.selectedProfessional === stylistName
     );
   };
 
@@ -42,17 +33,14 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
       booking.id === id ? { ...booking, status: newStatus } : booking
     );
     localStorage.setItem('appointments', JSON.stringify(updatedBookings));
-    
-    // Update stats
-    updateAppointmentStatus(id, newStatus);
-    updateStatsFromBookings();
+    window.location.reload();
   };
 
   const handleDelete = (id: number) => {
     const allBookings = JSON.parse(localStorage.getItem('appointments') || '[]');
     const updatedBookings = allBookings.filter((booking: AppointmentData) => booking.id !== id);
     localStorage.setItem('appointments', JSON.stringify(updatedBookings));
-    updateStatsFromBookings();
+    window.location.reload();
   };
 
   const handleMessage = async (message: string) => {
@@ -71,9 +59,11 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
         salon_phone: '(973) 344-5199',
         salon_address: '275 Adams St, Newark, NJ 07105'
       });
+      alert('Message sent successfully!');
       setMessageRecipient(null);
     } catch (error) {
       console.error('Failed to send message:', error);
+      alert('Failed to send message. Please try again.');
     }
   };
 
@@ -88,12 +78,16 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
   };
 
   const formatDate = (dateStr: string): string => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    try {
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateStr;
+    }
   };
 
   const formatTime = (timeStr: string): string => {
@@ -111,12 +105,6 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
       return timeStr;
     }
   };
-
-  // Calculate quick stats
-  const todayBookings = bookings.filter(b => b.appointmentDate === new Date().toISOString().split('T')[0]);
-  const pendingBookings = bookings.filter(b => b.status === 'PENDING');
-  const confirmedBookings = bookings.filter(b => b.status === 'CONFIRMED');
-  const completedBookings = bookings.filter(b => b.status === 'COMPLETED');
 
   return (
     <div className="space-y-6">
@@ -143,59 +131,26 @@ const StylistBookings: React.FC<StylistBookingsProps> = ({ stylistName }) => {
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h3 className="text-sm font-medium text-gray-600">Today's Bookings</h3>
-          <p className="text-2xl font-semibold mt-1">{todayBookings.length}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h3 className="text-sm font-medium text-gray-600">Pending</h3>
-          <p className="text-2xl font-semibold mt-1 text-yellow-600">{pendingBookings.length}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h3 className="text-sm font-medium text-gray-600">Confirmed</h3>
-          <p className="text-2xl font-semibold mt-1 text-green-600">{confirmedBookings.length}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h3 className="text-sm font-medium text-gray-600">Completed</h3>
-          <p className="text-2xl font-semibold mt-1 text-blue-600">{completedBookings.length}</p>
-        </div>
-      </div>
-
-      {/* Search and Filter */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search clients..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-glamour-gold/50 focus:border-glamour-gold"
-          />
-        </div>
-        <div className="relative">
-          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-glamour-gold/50 focus:border-glamour-gold appearance-none bg-white"
-          >
-            <option value="all">All Status</option>
-            <option value="PENDING">Pending</option>
-            <option value="CONFIRMED">Confirmed</option>
-            <option value="CANCELLED">Cancelled</option>
-            <option value="COMPLETED">Completed</option>
-          </select>
-        </div>
-      </div>
-
       <div className="bg-white rounded-lg shadow-md">
+        <div className="p-4 border-b">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Total Bookings</p>
+              <p className="text-2xl font-semibold">{bookings.length}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Today's Bookings</p>
+              <p className="text-2xl font-semibold">
+                {bookings.filter(b => b.appointmentDate === new Date().toISOString().split('T')[0]).length}
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="divide-y">
           {bookings.length === 0 ? (
             <div className="p-6 text-center text-gray-500">
-              No bookings found
+              No bookings found for this stylist
             </div>
           ) : (
             bookings.map((booking) => (
