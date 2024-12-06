@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Route, Routes } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -16,6 +16,7 @@ import ClientManagement from './ClientManagement';
 import ServiceTracking from './ServiceTracking';
 import Reports from './Reports';
 import Communications from './Communications';
+import StylistPortal from './stylist/StylistPortal';
 
 const DashboardLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -36,23 +37,6 @@ const DashboardLayout: React.FC = () => {
     { id: 'communications', label: 'Communications', icon: MessageSquare },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <DashboardStats />;
-      case 'clients':
-        return <ClientManagement />;
-      case 'services':
-        return <ServiceTracking />;
-      case 'reports':
-        return <Reports />;
-      case 'communications':
-        return <Communications />;
-      default:
-        return <DashboardStats />;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -83,7 +67,14 @@ const DashboardLayout: React.FC = () => {
       {/* Main Content */}
       <div className="lg:ml-64 min-h-screen">
         <div className="p-6">
-          {renderContent()}
+          <Routes>
+            <Route path="/" element={<DashboardStats />} />
+            <Route path="/clients" element={<ClientManagement />} />
+            <Route path="/services" element={<ServiceTracking />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/communications" element={<Communications />} />
+            <Route path="/stylist/:stylistName/*" element={<StylistPortal />} />
+          </Routes>
         </div>
       </div>
 
