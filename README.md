@@ -160,6 +160,6 @@ This project is licensed under the MIT License.
 
 ## 📞 Support
 
-For technical support, please contact:
+For Technical support, please contact:
 - Email: info@glamoursbeauty.com
-- Phone: (973) 344-5199
+- Phone: (973) 344-5199 
