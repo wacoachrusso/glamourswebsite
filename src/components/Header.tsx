@@ -11,10 +11,8 @@ const Header: FC = () => {
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About Us' },
     { path: '/services', label: 'Services' },
-    { path: '/booking', label: 'Book Now' },
     { path: '/team', label: 'Our Team' },
     { path: '/products', label: 'Products' },
-    { path: '/employee-login', label: 'Staff Portal' }
   ];
 
   useEffect(() => {

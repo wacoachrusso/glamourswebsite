@@ -42,22 +42,12 @@ const HeroSection: FC = () => {
         {/* Enhanced CTA Buttons with Hover Effects */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 opacity-0 animate-[fadeInUp_1s_ease-out_1s_forwards]">
           <Link
-            to="/booking"
-            className="px-10 py-4 bg-white text-glamour-dark rounded-full font-semibold transform hover:-translate-y-1 transition-all duration-300 flex items-center group shadow-lg hover:shadow-xl relative overflow-hidden border-2 border-glamour-gold"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-glamour-gold to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative flex items-center">
-              <Scissors className="w-5 h-5 mr-3 text-glamour-gold group-hover:text-white transition-colors" />
-              <span className="group-hover:text-white transition-colors">Book Appointment</span>
-            </div>
-          </Link>
-          <Link
             to="/services"
             className="px-10 py-4 bg-white text-glamour-dark rounded-full font-semibold transform hover:-translate-y-1 transition-all duration-300 flex items-center group shadow-lg hover:shadow-xl relative overflow-hidden border-2 border-glamour-gold"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-glamour-gold to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative flex items-center">
-              <Star className="w-5 h-5 mr-3 text-glamour-gold group-hover:text-white transition-colors" />
+              <Scissors className="w-5 h-5 mr-3 text-glamour-gold group-hover:text-white transition-colors" />
               <span className="group-hover:text-white transition-colors">View Services</span>
             </div>
           </Link>

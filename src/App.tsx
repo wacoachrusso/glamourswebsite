@@ -4,9 +4,6 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import Header from './components/Header';
 import Home from './components/Home';
 import Services from './components/Services';
-import Booking from './components/Booking';
-import EmployeeLogin from './components/EmployeeLogin';
-import DashboardLayout from './components/dashboard/DashboardLayout';
 import MeetTheTeam from './components/MeetTheTeam';
 import AboutUs from './components/AboutUs';
 import Products from './components/Products';
@@ -18,32 +15,21 @@ const App: FC = () => {
   return (
     <LanguageProvider>
       <Router>
-        <Routes>
-          <Route path="/employee-dashboard/*" element={<DashboardLayout />} />
-          
-          <Route
-            path="*"
-            element={
-              <div className="flex flex-col min-h-screen">
-                <Header />
-                <main className="flex-grow pt-24">
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/services" element={<Services />} />
-                    <Route path="/booking" element={<Booking />} />
-                    <Route path="/employee-login" element={<EmployeeLogin />} />
-                    <Route path="/team" element={<MeetTheTeam />} />
-                    <Route path="/about" element={<AboutUs />} />
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/privacy" element={<PrivacyPolicy />} />
-                    <Route path="/terms" element={<Terms />} />
-                  </Routes>
-                </main>
-                <Footer />
-              </div>
-            }
-          />
-        </Routes>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <main className="flex-grow pt-24">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/team" element={<MeetTheTeam />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<Terms />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
       </Router>
     </LanguageProvider>
   );

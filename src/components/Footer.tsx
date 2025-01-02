@@ -66,11 +66,9 @@ const Footer: FC = () => {
             <ul className="space-y-2">
               {[
                 { path: '/services', label: 'Our Services' },
-                { path: '/booking', label: 'Book Appointment' },
                 { path: '/products', label: 'Products' },
                 { path: '/team', label: 'Meet Our Team' },
-                { path: '/about', label: 'About Us' },
-                { path: '/employee-login', label: 'Staff Portal' }
+                { path: '/about', label: 'About Us' }
               ].map((link) => (
                 <li key={link.path}>
                   <button 
