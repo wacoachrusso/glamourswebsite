@@ -1,5 +1,4 @@
 import React from 'react';
-import { Scissors, Sparkles, Brush } from 'lucide-react';
 
 const Services: React.FC = () => {
   const serviceCategories = [
